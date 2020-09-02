@@ -1,0 +1,155 @@
+@import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css);
+
+HTML{
+    margin: 0; padding: 0;
+}
+BODY{
+    margin: 0;
+    padding: 0;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px !important;
+    background-color: #fff;
+    color: #333;
+}
+
+
+.hide{
+    display: none;
+}
+.tophead{
+    height: 5vw;
+    max-height: 50px;
+    padding: 10px;
+    background-color: #0d0d0d;
+    text-align: center;
+    position: fixed;
+    width: 100vw;
+    z-index: 1000;
+}
+.tophead IMG{
+    height: 100%;
+    width: auto;
+}
+
+.portfolio .toppad{
+    height: 7vw;
+    max-height: 70px;
+}
+.portfolio{
+    width: 100vw;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.container{
+    box-shadow: 0 0vw 20vw rgba(0,0,0,0.2);
+    position: relative;
+}
+
+.container:hover{
+    z-index: 100;
+    position: relative;
+}
+
+.container .wrap{
+    overflow: hidden;
+    overflow-x: hidden;
+}
+
+.container .movie,
+.container .inner IMG{
+    width: 100vw;
+    height: auto;
+    max-width: 1100px;
+    display: block;
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+
+.container .slider{
+    clear: both;
+}
+.container .slider .arrow{
+    position: absolute;
+    display: inline-block;
+}
+.container .slider .arrow IMG{
+    width: auto;
+}
+.container .slider .arrowL{
+    margin-top: -300px;
+}
+.container .slider .arrowR{
+    right: 0px;
+}
+
+.footer{
+    text-align: center;
+    background-color: #0d0d0d;
+    padding: 20vw 0 20vw 0;
+}
+.footer IMG{ width: 20vw; }
+.footer H1{
+    font-size: 3vw;
+    color: #fff;
+    font-weight: 100;
+}
+.footer P{
+    clear: both;
+    color: #ccc;
+}
+
+@media all and (max-width:1100px){
+    .container .slider .arrow IMG{
+        height: 56.272727vw;
+    }
+    .container .slider .arrow{
+        margin-top: -56.272727vw;
+    }
+    .container .c2{ width: 200vw; }
+    .container .c3{ width: 300vw; }
+    .container .c4{ width: 400vw; }
+    .container .c5{ width: 500vw; }
+    .container .c6{ width: 600vw; }
+    .container .c7{ width: 700vw; }
+    .container .c8{ width: 800vw; }
+    .container .c9{ width: 900vw; }
+    .container .movie IFRAME{
+        width: 100vw;
+        height: 56.272727vw;
+    }
+}
+@media all and (min-width:1101px){
+    .container .movie IFRAME{
+        width: 1100px;
+        height: 619px;
+    }
+    .footer{
+        padding: 220px 0 220px 0;
+    }
+    .footer IMG{
+        width: 220px;
+    }
+    .footer H1{
+        font-size: 35px;
+    }
+    .container .wrap{
+        width: 1100px; height: 619px;
+    }
+    .container .slider .arrow IMG{
+        width: auto;
+        height: 619px;
+    }
+    .container .slider .arrow{
+        margin-top: -619px;
+    }
+    .container .c2{ width: 2200px; }
+    .container .c3{ width: 3300px; }
+    .container .c4{ width: 4400px; }
+    .container .c5{ width: 5500px; }
+    .container .c6{ width: 6600px; }
+    .container .c7{ width: 7700px; }
+    .container .c8{ width: 8800px; }
+    .container .c9{ width: 9900px; }
+}

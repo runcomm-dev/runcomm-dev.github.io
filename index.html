@@ -1,0 +1,281 @@
+<!DOCTYPE HTML>
+<html data-language="Korean">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Runcomm : Real Unique Network & Communication</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+    
+var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ? true : false;
+function Slider( key, len ){
+    this.key = key;
+    this.len = len;
+    this.width = 1100;
+    this.current = 1;
+    this.area = $('#P'+key);
+    this.wrap = $('#P'+key+' .wrap');
+    
+    this.ready = function(){
+        var inner = $('#P'+key+' .inner');
+        inner.addClass('c'+this.len);
+        for( var n = 1; n <= this.len; n++ ){
+            if( this.key == 4 && n == 3 ){
+                inner.append('<div class="movie"><iframe src="https://player.vimeo.com/video/452450640?loop=1&byline=0&portrait=0" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe></div>');
+            }else if( n > 1 ){
+                inner.append('<img src="./img'+this.key+'-'+n+'.png"/>')
+            }
+        }
+        $('#P'+key+' #AL').on('click',this.onClickL.bind(this));
+        $('#P'+key+' #AR').on('click',this.onClickR.bind(this));
+        
+        if( this.key == 1 ){
+            var tg =  $('#P'+key+' #AL IMG');
+            tg.attr('src', tg.attr('src').replace('L','L2'));
+            tg =  $('#P'+key+' #AR IMG');
+            tg.attr('src', tg.attr('src').replace('R','R2'));
+        }
+        
+        console.log('ready');
+        var arr = $('#P'+key+' .inner IMG');
+        var n = arr.length;
+        while( n-- ){
+            $(arr[n]).on('mousedown touchstart',this.onTouchdown.bind(this));
+            
+        }
+        $(document).on('mouseup touchend',this.onTouchup.bind(this));
+        $(document).on('mousemove touchmove',this.onScrollMove.bind(this));
+//        $('.portfolio IMG').on('touchstart touchend',this.onTouchEvent.bind(this));
+//        $('.portfolio IMG').on('mousedown mouseup',this.onTouchEvent.bind(this));
+    }
+    
+    this.isTouch = false;
+    this.useMove = false;
+    this.press = 0;
+    this.size = 0;
+    
+    this.scrLock = false;
+    this.space = 0;
+    this.scroll = 0;
+    this.time = 0;
+    this.lastPos = 0;
+    
+    this.onScrollMove = function(e){
+        if( this.useMove ){
+            var v = (isMobile)? e.originalEvent.touches[0].screenX:e.pageX;
+            this.wrap.scrollLeft( this.press - v );
+        }
+    }
+    this.onTouchup = function(e){
+        if( this.useMove ){
+            this.useMove = false;
+            var v = Math.round(this.wrap.scrollLeft() / this.size) * this.size;
+            console.log( v );
+            this.wrap.stop().animate({scrollLeft:v});
+        }
+    }
+    
+    this.onTouchdown = function(e){
+        this.size = e.currentTarget.width;
+        this.useMove = true;
+        if( isMobile ){
+            this.press = this.wrap.scrollLeft() + e.originalEvent.touches[0].screenX;
+        }else{
+            this.press = this.wrap.scrollLeft() + e.pageX;
+        }
+    }
+    
+    this.onTouchEvent = function(e){
+        console.log( e.type );
+        e.preventDefault();
+        switch( e.type ){
+            case 'mousedown':
+            case 'touchstart':
+                this.press = (e.touches)?
+                    e.touches[0].screenX:
+                    e.mousex;
+                console.log( this.press );
+                this.scroll = $('#'+this.key).scrollLeft();
+                this.space = $('#'+this.key).outerWidth();
+                this.time = new Date().getTime();
+                this.scrLock = true;
+                break;
+            case 'touchend':
+                this.press = 0;
+                this.scrLock = false;
+                this.time = new Date().getTime() - this.time;
+                if( this.time < 200 ){
+                    var p = 0;
+                    if( this.lastPos < 0 ) p++;
+                    else p--;
+                    this.swipe( p );
+                    return;
+                }else{
+                    this.magnetic();
+                    return;
+                }
+                break;
+        }
+        if( this.press == 0 ) return;
+        if( e.type == 'touchmove' ){
+            var pos = e.touches[0].screenX - this.press;
+            this.lastPos = pos;
+            $('#'+this.key).scrollLeft( this.scroll - pos );
+        }
+    }
+    
+    this.render = function( isQuick ){
+        var v = this.width * (this.current-1);
+        console.log( v );
+        this.wrap.stop().animate({scrollLeft:v});
+        
+    }
+    this.quick = function(){
+        var v = this.width * (this.current-1);
+        this.wrap.stop().animate({scrollLeft:v},1);
+    }
+    
+    this.onClickL = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        this.current--;
+        if( this.current < 1 ) this.current = 1;
+        this.render();
+    }
+    this.onClickR = function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        this.current++;
+        if( this.current > this.len ) this.current = this.len;
+        this.render();
+    }
+}
+function Layout(){
+    this.members = [];
+    this.width = 0;
+    
+    this.ready = function(){
+        
+        var match = [0,
+            4,  2,  4,  4,  2,
+            2,  3,  2,  3
+        ];
+        var tg, sh = $('#SliderH').html();
+        for( var n = 1; n <= 16; n++ ){
+            tg = new Slider( n, match[n] );
+            tg.area.append( sh );
+            tg.ready();
+            this.members.push( tg );
+        }
+        $(window).resize( this.updateSize.bind(this));
+        this.updateSize();
+    }
+    this.updateSize = function(e){
+        var w = $('#P1').outerWidth();
+        if( this.width == w ) return;
+        var tg, n = this.members.length;
+        this.width = w;
+        while( n-- ){
+            tg = this.members[n];
+            tg.width = w;
+            tg.quick();
+        }
+    }
+}
+
+$layout = new Layout();
+
+$(document).ready(function(){
+    $layout.ready();
+});
+</script>
+</head>
+    
+    
+<body>
+    
+    
+<div class="tophead">
+    <img src="logo.png"/>
+</div>
+
+<div id="SliderH" class="hide">
+    <div class="slider">
+        <a href="#" id="AL" class="arrow arrowL"><img src="arrowL.png"/></a>
+        <a href="#" id="AR" class="arrow arrowR"><img src="arrowR.png"/></a>
+    </div>
+</div>
+<div id="MovieH" class="hide">
+    <div class="movie">
+        <iframe src="https://player.vimeo.com/video/452450640?loop=1&byline=0&portrait=0" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+</div>
+    
+<div class="portfolio">
+    <div class="toppad">&nbsp;</div>
+    
+        
+    <div id="P1" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img1-1.png"/>
+            </div></div>
+    </div>
+    <div id="P7" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img7-1.png"/>
+            </div></div>
+    </div>
+    <div id="P2" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img2-1.png"/>
+            </div></div>
+    </div>
+    <div id="P3" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img3-1.png"/>
+            </div></div>
+    </div>
+    <div id="P4" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img4-1.png"/>
+            </div></div>
+    </div>
+    <div id="P5" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img5-1.png"/>
+            </div></div>
+    </div>
+    <div id="P6" class="container">
+        <div class="wrap">
+        <div class="inner">
+            <img src="img6-1.png"/>
+            </div></div>
+    </div>
+    
+</div>
+    
+<div class="footer">
+    <div>
+        <img src="logo.png"/>
+        <h1>
+            런커뮤니케이션즈는 오늘도 고객의 브랜드 가치를 위해<br>
+            우리의 잠재력과 약속으로 최선을 다합니다.
+        </h1>
+        <p>
+            서울시 성동구 고산자로 253, 1201호 (도선동, 다남매 Tower)<br>
+            담당자 김승룡 : srkim@runcomm.co.kr  Dir.070-4442-3344
+        </p>
+    </div>
+</div>
+    
+    
+</body>
+</html>
