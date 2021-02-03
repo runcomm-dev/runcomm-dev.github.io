@@ -49,7 +49,6 @@ func requestCameraPermission(){
             }
         })
     }
-    
 ```
 
 ## 터치애드 플랫폼 클래스 함수
