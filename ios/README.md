@@ -35,7 +35,7 @@ end
 | Key | Type | Value |
 |---|---|---|
 | nformation Property List|Dictionary|(1 item)|
-| `Privacy - Camera Usage Description`|String|교통카드 사진촬영을 위해 필요합니다.|
+| Privacy - Camera Usage Description|String|교통카드 사진촬영을 위해 필요합니다.|
 
 * 앱프로젝트에서 카메라 권한을 직접 설정할 경우 아래와 같은 메서드를 작성하여 사용합니다.
 
