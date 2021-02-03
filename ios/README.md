@@ -2,7 +2,10 @@
 
 * 정상적인 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 Frameworks폴더에 위치시켜 줍니다.
+* 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
+* 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.framework폴더를 선택합니다.
+* Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.framework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
+
 
 ## CocoaPods 설정
 1. **Podfile 파일수정**
@@ -13,15 +16,40 @@ source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '10.0'
 use_frameworks!
 
-target 'Your Target Name' do
+target 'TouchadSDK' do
 
   pod 'SnapKit'
   pod 'ChannelIO'
-  pod 'KeychainItemWrapper'
   pod 'ObjectMapper'
   pod 'Kingfisher'
+  pod 'JWTDecode', '~> 2.4'
   
 end
+```
+
+## 권한 설정
+1. **카메라**
+* 교통카드 카메라 인식기능에 카메라 사용권한이 필요합니다.
+* 앱프로젝트 info.plist 에 아래내용을 추가합니다.
+
+| Key | Type | Value |
+|---|---|---|
+| nformation Property List|Dictionary|(1 item)|
+| `Privacy - Camera Usage Description`|String|교통카드 사진촬영을 위해 필요합니다.|
+
+* 앱프로젝트에서 카메라 권한을 직접 설정할 경우 아래와 같은 메서드를 작성하여 사용합니다.
+
+```
+func requestCameraPermission(){
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+            if granted {
+                print("Camera: 권한 허용")
+            } else {
+                print("Camera: 권한 거부")
+            }
+        })
+    }
+    
 ```
 
 ## 터치애드 플랫폼 클래스 함수
@@ -163,3 +191,4 @@ TASDKManager.startTouchAdWebview()
 * 프로젝트명 : TouchAd_IOS
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
+
