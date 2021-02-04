@@ -36,7 +36,7 @@
 
 ### SDK build.gradle(app)
 
-* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 이미지 로딩 라이브러리(glide), FCM, 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), 카메라 라이브러리(camerax), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
+* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 이미지 로딩 라이브러리(glide), FCM, 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
 * buildTypes에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
 * buildTypes에 consumerProguardFile을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
 * 아래는 SDK에 실제 적용된 내용입니다.
@@ -117,13 +117,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     compile files('libs/card.io-5.5.1.jar')
 
-    def camerax_version = "1.0.0-beta03"
-    // CameraX core library using camera2 implementation
-    implementation "androidx.camera:camera-camera2:$camerax_version"
-    // CameraX Lifecycle Library
-    implementation "androidx.camera:camera-lifecycle:$camerax_version"
-    // CameraX View class
-    implementation "androidx.camera:camera-view:1.0.0-alpha10"
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
 
     implementation 'com.google.firebase:firebase-core:17.4.3'
@@ -142,7 +135,7 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 **사용자**가 모두 수락할 경우 앱을 계속 진행하게 되며 위 세개의 권한 중 하나라도 거부를 할 경우 ‘모든 권한을 수락하셔야 합니다.’ 라는 토스트가 띄워 주면서 앱을 종료하게 됩니다.
+* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 **사용자**가 모두 수락할 경우 앱을 계속 진행하게 되며 위 세개의 권한 중 하나라도 거부를 할 경우 ‘모든 권한을 수락하셔야 합니다.’ 라는 토스트가 나타나며 앱을 종료하게 됩니다.
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 시 참고하시면 됩니다.
 ~~~
 private fun checkRequiredPermission() {
@@ -263,22 +256,7 @@ private fun checkRequiredPermission() {
            </activity>
    
            <activity android:name="io.card.payment.DataEntryActivity"/>
-   
-           <!-- 딥링크 게이트웨이 -->
-           <activity android:name="kr.co.touchad.ui.activity.deeplink.SchemeActivity"
-               android:launchMode="singleTask"
-               android:theme="@style/Theme.TransparentTouchAd"
-               android:noHistory="true">
-               <intent-filter >
-                   <action android:name="android.intent.action.VIEW" />
-                   <category android:name="android.intent.category.DEFAULT" />
-                   <category android:name="android.intent.category.BROWSABLE" />
-                   <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main" />
-                   <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise" />
-                   <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise_point_list" />
-                   <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/card_register" />
-               </intent-filter>
-           </activity>
+
        </application>
    </manifest>
 ~~~
@@ -430,13 +408,6 @@ implementation 'com.squareup.retrofit2:retrofit:2.5.0'
 implementation 'com.squareup.retrofit2:converter-gson:2.5.0'  
 implementation 'com.squareup.okhttp3:okhttp:3.12.0'  
 implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'  
-def camerax_version = "1.0.0-beta03"  
-// CameraX core library using camera2 implementation  
-implementation "androidx.camera:camera-camera2:$camerax_version"  
-// CameraX Lifecycle Library  
-implementation "androidx.camera:camera-lifecycle:$camerax_version"  
-// CameraX View class  
-implementation "androidx.camera:camera-view:1.0.0-alpha10"  
 implementation 'com.google.firebase:firebase-messaging:20.2.1'  
 implementation 'com.google.firebase:firebase-core:17.4.3'  
 implementation "androidx.viewpager2:viewpager2:1.0.0"  
