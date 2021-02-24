@@ -13,15 +13,14 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '9.0'
 use_frameworks!
 
 target 'TouchadSDK' do
 
   pod 'SnapKit'
-  pod 'ChannelIO'
+  pod 'Alamofire', '~> 4.8.2'
   pod 'ObjectMapper'
-  pod 'Kingfisher'
   pod 'JWTDecode', '~> 2.4'
   
 end
@@ -34,7 +33,7 @@ end
 
 | Key | Type | Value |
 |---|---|---|
-| nformation Property List|Dictionary|(1 item)|
+| Information Property List|Dictionary|(1 item)|
 | Privacy - Camera Usage Description|String|교통카드 사진촬영을 위해 필요합니다.|
 
 * 앱프로젝트에서 카메라 권한을 직접 설정할 경우 아래와 같은 메서드를 작성하여 사용합니다.
@@ -60,15 +59,17 @@ public class TASDKManager: NSObject {
   
 /**
 * 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.
-* @param mbrId, platformId, pushToken
+* @param mbrId: 매체사 회원관리번호 (필수)
+* @param platformId: 매체사 플랫폼 고정값  (필수)
+* @param pushToken: 매체사앱 FCM PUSH TOKEN  (선택)
 */
     func initialize(_ mbrId : String, platformId : String, pushToken : String)
 
 /**
 * 터치애드 전면광고 오픈
-* @param notification
+* @param userInfo: apns custom data
 */
-    func openAdvertise(_ notification: UNNotification)
+    func openAdvertise(_ userInfo: [AnyHashable : Any])
 
 /**
 * 터치애드 충전소 화면 시작
@@ -84,9 +85,9 @@ public class TASDKManager: NSObject {
 
 * **TASDKManager.initialize 함수를 이용하여 필수 파라미터 및 옵셔널한 파라미터 정보를 설정하여 초기화 함수를 호출합니다.**
 
-**(필수) mbr_id -> 매체사 회원 식별키**
+**(필수) mbr_id -> 매체사 회원 관리번호**
 **(필수) platform_id -> 터치애드 관리자가 발급한 매체사 구분값**
-**(옵션) pushToken -> 푸시토큰**
+**(선택) pushToken -> 매체사앱 FCM 푸시토큰**
 
 * **주의** : ***pushToken 경우 매체사와의 협의결과에 따라 전달 여부 결정*** 
 
@@ -119,7 +120,7 @@ public class TASDKManager: NSObject {
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
-TASDKManager.openAdvertise(notification)
+TASDKManager.openAdvertise(userInfo)
 ```
 
 ## 터치애드 광고 플랫폼 회원처리 시작
@@ -133,7 +134,7 @@ TASDKManager.startTouchAdWebview()
 
 ## 터치애드 카드 등록
 
-* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.(현재 양각 카드만 스캔이 가능하며 양각이외의 카드 스캔기능이 추가될 수 있습니다.)
+* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.(양각 카드 경우 인식률이 떨어질수 있습니다.)
 
 * 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
 
