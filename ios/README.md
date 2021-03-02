@@ -18,7 +18,7 @@ use_frameworks!
 
 target 'TouchadSDK' do
 
-  pod 'SnapKit'
+  pod 'SnapKit', '~> 4.0.0'
   pod 'Alamofire', '~> 4.8.2'
   pod 'ObjectMapper'
   pod 'JWTDecode', '~> 2.4'
