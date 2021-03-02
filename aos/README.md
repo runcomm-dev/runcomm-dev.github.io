@@ -11,13 +11,13 @@
   * FCM Push 기능 : 적립, 통신비 차감, 전면광고 결과화면
 
    ## 매체사 앱 SDK 연동을 위한 업무진행 절차
-  * 광고SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
-  * 광고SDK 라이브러리(.aar) 앱프로젝트 Import.
-  * 추가코딩 (SDK초기화, 전면광고적용, FCM리시버)
-  * FCM전송 Public Web API(POST방식) 제작후 광고SDK담당자에게 전달
-  * 테스트용 apk파일 광고SDK 담당자에게 전달
-  * 광고SDK 기능테스트 (가입,적립,차감,FCM)
-  * 상세한 기술적 내용은 아래 TouchAd SDK구성, TouchAd SDK 설치 가이드를 참고하시기 바랍니다.
+  * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
+  * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
+  * 추가코딩 (SDK 초기화, 전면광고적용, FCM 리시버)
+  * FCM 전송 Public Web API(POST 방식) 제작후 광고 SDK 담당자에게 전달
+  * 테스트용 apk 파일 광고 SDK 담당자에게 전달
+  * 광고 SDK 기능테스트 (가입, 적립, 차감, FCM)
+  * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
 
 
 
@@ -29,17 +29,18 @@
 
 * 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For 매체사 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
-* SDK결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 28, compileSdkVerison : 29 (으)로 빌드되었습니다.
+* SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
+* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 28, compileSdkVersion : 29 (으)로 빌드되었습니다.
 
 
 
 ### SDK build.gradle(app)
 
-* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 이미지 로딩 라이브러리(glide), FCM, 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
-* buildTypes에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
-* buildTypes에 consumerProguardFile을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
-* 아래는 SDK에 실제 적용된 내용입니다.
+* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), FCM 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
+* lib폴더에 신용카드 스캔을 하기위한 card.io-5.5.1.jar 파일을 컴파일 하기위해 dependencies에 선언문이 추가되어 있습니다.
+* buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
+* buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
+* 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
 apply plugin: 'com.android.library'
@@ -51,11 +52,11 @@ android {
     compileSdkVersion 29
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 17
         targetSdkVersion 28
-        versionCode 1016
+        versionCode 1021
         versionName "0.0.1"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
 
     }
 
@@ -79,6 +80,9 @@ android {
             consumerProguardFile 'proguard-rules.pro'
         }
     }
+    //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 명시를 해 주어야
+    // Android Studio에서 Run이 정상 동작을 한다.
+    //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
     flavorDimensions "flavors"
     productFlavors{
         dev{
@@ -87,10 +91,7 @@ android {
         product{
             dimension "flavors"
         }
-        //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 Flavor를 설정해 주어야
-        // Android Studio에서 Run이 정상 동작을 한다.
-        //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
-        defaultPublishConfig "devDebug"
+
     }
 
     compileOptions {
@@ -114,18 +115,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     compile files('libs/card.io-5.5.1.jar')
-
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
-
     implementation 'com.google.firebase:firebase-core:17.4.3'
-    implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
+    implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
     implementation 'com.google.firebase:firebase-analytics:17.2.0'
-    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'com.auth0.android:jwtdecode:2.0.0'
+
 }
 ~~~
 
@@ -180,96 +177,97 @@ private fun checkRequiredPermission() {
 
 * 참조용으로 SDK 내에 설정된 내용입니다.
 ~~~
-   <?xml version="1.0" encoding="utf-8"?>
-   <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-       package="kr.co.touchad">
-   
-       <!--인터넷 접속(네트워크 작업)을 위한 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.INTERNET"/>
-   
-       <!--네트워크 연결확인을 위한 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-   
-       <!--디바이스 진동사용 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.VIBRATE" />
-   
-       <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.WAKE_LOCK" />
-   
-       <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-   
-       <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
-       <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-   
-       <uses-feature android:name="android.hardware.camera.any" />
-   
-       <!--카메라 사용 권한 // 권한 레벨 : 위험-->
-       <uses-permission android:name="android.permission.CAMERA" />
-   
-       <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
-       <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-   
-       <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
-       <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-   
-       <application
-           android:icon="@mipmap/tc_ic_launcher"
-           android:label="@string/app_name"
-           android:roundIcon="@mipmap/tc_ic_launcher_round"
-           android:supportsRtl="true"
-           android:allowBackup="false"
-           android:usesCleartextTraffic="true"
-           android:theme="@style/TouchAdTheme">
-   
-           <!--CPI 광고 처리를 위한 서비스 -->
-           <service
-               android:name="kr.co.touchad.ui.service.TouchAdService"
-               android:enabled="true">
-               <intent-filter>
-                   <action android:name="kr.co.touchad.ui.service" />
-                   <category android:name="android.intent.category.DEFAULT" />
-               </intent-filter>
-           </service>
-   
-           <!-- 웹뷰화면 -->
-           <activity android:name="kr.co.touchad.ui.activity.webview.WebViewActivity"
-               android:theme="@style/TouchAdTheme">
-           </activity>
-   
-           <!-- 전체 광고 화면 -->
-           <activity android:name="kr.co.touchad.ui.activity.advertise.AdFullActivity"
-               android:theme="@style/TouchAdTheme">
-           </activity>
-   
-           <!-- 카드등록 화면 -->
-           <activity android:name="kr.co.touchad.ui.activity.card.CardRegisterActivity"
-               android:theme="@style/TouchAdTheme"
-               android:windowSoftInputMode="stateHidden">
-           </activity>
-   
-           <!-- 카드 스캔 화면 -->
-           <activity android:name="kr.co.touchad.ui.activity.card.CardScanActivity"
-               android:theme="@style/TouchAdTheme"
-               android:configChanges="orientation"
-               android:screenOrientation="portrait">
-           </activity>
-   
-           <activity android:name="io.card.payment.DataEntryActivity"/>
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="kr.co.touchad.sdk">
 
-       </application>
-   </manifest>
+    <!--인터넷 접속(네트워크 작업)을 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!--네트워크 연결확인을 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--디바이스 진동사용 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <uses-feature android:name="android.hardware.camera.any" />
+
+    <!--카메라 사용 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <application
+        android:icon="@mipmap/tc_ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/tc_ic_launcher_round"
+        android:supportsRtl="true"
+        android:allowBackup="false"
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true"
+        android:theme="@style/TouchAdTheme">
+
+        <!--CPI 광고 처리를 위한 서비스 -->
+        <service
+            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="kr.co.touchad.ui.service" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <!-- 웹뷰화면 -->
+        <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
+            android:theme="@style/TouchAdTheme">
+        </activity>
+
+        <!-- 전체 광고 화면 -->
+        <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
+            android:theme="@style/TouchAdTheme">
+        </activity>
+
+        <!-- 카드등록 화면 -->
+        <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
+            android:theme="@style/TouchAdTheme"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+
+        <!-- 카드 스캔 화면 -->
+        <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardScanActivity"
+            android:theme="@style/TouchAdTheme"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name="io.card.payment.DataEntryActivity"/>
+        
+    </application>
+</manifest>
 ~~~
 
 
 
 ### proguard-rules.pro 파일
 
-* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 glide, stactrace오류보고에 대한 난독화 예외도 추가합니다.
+* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
+* 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
-   -keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
+-keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
 -keep class android.support.** { *; }
 -keep class com.google.** { *; }
 -keepparameternames#파라미터 이름을 난독화x
@@ -313,7 +311,7 @@ private fun checkRequiredPermission() {
 
 ### Foreground Service
 
-* 터치애드는 CPI광고(Cost Per Install) 설치 체크를 위해 CPI광고 참여시 background service를 시작합니다.
+* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
 
 * targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
 
@@ -331,101 +329,122 @@ private fun checkRequiredPermission() {
 
 #  TouchAd SDK 설치 가이드
 
-* 정상적인 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
+* 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
 ## build.gradle 설정 
 
   1. **build.gradle(project)파일수정**
-     * Project build.gradle의 내용은 수정하지 않습니다.
-     
+     * firebase를 사용하기 위해 아래 dependencies의 calsspath에 google-services와 firebase-crashlytics를 추가합니다.
+     * allprojects안의 repositories에 maven내용을 추가합니다.
+     * 아래는 실제 작성된 예시입니다.
+~~~
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
+        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
+        //classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18"
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://maven.google.com'}
+
+        jcenter()
+        google()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+~~~
+
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
      *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.0’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
-apply plugin: 'com.android.application'  
-apply plugin: 'kotlin-android'  
-apply plugin: 'kotlin-android-extensions'  
-apply plugin: 'com.google.gms.google-services'  
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
+android {
+    compileSdkVersion 29
 
-android {  
-compileSdkVersion 29  
+    defaultConfig {
+        applicationId "kr.co.touchad"
+        minSdkVersion 17
+        targetSdkVersion 28
+        versionCode 1021
+        versionName "0.0.1"
+        multiDexEnabled true
+    }
 
-defaultConfig {  
-applicationId "kr.co.touchad"  
-minSdkVersion 21  
-targetSdkVersion 28  
-versionCode 1016  
-versionName "0.0.1"  
-testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"  
-}  
-buildTypes {  
-release {
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
 
-minifyEnabled true
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 
-proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-
-'proguard-rules.pro'
-
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
 }
 
-}  
-}  
-compileOptions {  
-sourceCompatibility 1.8  
-targetCompatibility 1.8  
-}  
-
-lintOptions {  
-checkReleaseBuilds false  
-// Or, if you prefer, you can continue to check for errors in release builds,  
-// but continue the build even when errors are found:  
-abortOnError false  
-}  
-}  
-///////추가내용//////
-
-repositories{  
-flatDir{  
-dirs 'libs'  
-}  
+repositories {
+    flatDir{
+        dirs 'libs'
+    }
 }
 
-////////////////////  
-dependencies {  
-implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"  
-implementation 'androidx.appcompat:appcompat:1.1.0'  
-implementation 'androidx.constraintlayout:constraintlayout:1.1.3'  
-implementation 'com.squareup.retrofit2:retrofit:2.5.0'  
-implementation 'com.squareup.retrofit2:converter-gson:2.5.0'  
-implementation 'com.squareup.okhttp3:okhttp:3.12.0'  
-implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'  
-implementation 'com.google.firebase:firebase-messaging:20.2.1'  
-implementation 'com.google.firebase:firebase-core:17.4.3'  
-implementation "androidx.viewpager2:viewpager2:1.0.0"  
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'  
-implementation 'com.github.bumptech.glide:glide:4.8.0'
+dependencies {
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
+    implementation 'com.google.firebase:firebase-messaging:20.2.1'
+    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
 
-///////////////////추가내용/////////////////////////////
-
-implementation name: ’touchad-sdk-1.0.0’, ext: ’arr’
-
-///////////////////////////////////////////////////////  
-implementation 'com.google.firebase:firebase-analytics:17.2.0'  
-testImplementation 'junit:junit:4.12'  
-androidTestImplementation 'androidx.test.ext:junit:1.1.1'  
-androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'  
-implementation 'com.makeramen:roundedimageview:2.3.0'  
+    implementation name: 'touchad-sdk-1.0.0', ext: 'aar'
+    
+    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
 }
 ~~~
 
@@ -456,12 +475,6 @@ fun  onMessageReceived(context: Context, data: String?)
 * @param context, link
 */
 fun  openTouchAdAdvertise(context: Context)
-
-/**
-* 터치애드 카드등록 오픈
-* @param context, link
-*/
-fun  openTouchAdCard(context: Context)
 
 /**
 * 터치애드 충전소 화면 시작
@@ -561,11 +574,11 @@ TouchAdPlatform.startTouchAdWebview(context)
 
 ##  터치애드 카드 등록
 
-* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.(**현재 양각 카드만 스캔이 가능하며 양각이외의 카드 스캔기능이 추가될 수 있습니다.**)
-* 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 **카드스캔(또는 직접입력) 후 등록**을 하면 광고참여가 가능하게 됩니다.
-~~~
-TouchAdPlatform.startTouchAdCard(context)
-~~~
+* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.
+(**양각 카드 경우 인식률이 떨어질 수 있습니다.**)
+* 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
+* 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 카드스캔(또는 직접입력) 후 등록을 하면 광고참여가 
+  가능하게 됩니다.
 
 
 
@@ -649,7 +662,7 @@ class FcmListenerService : FirebaseMessagingService() {
 
 ## Sample 프로젝트
 
-* 프로젝트명 : TouchAd_Sample_Android
+* 프로젝트명 : and_TouchAd
 * 패키지명 : kr.co.touchad
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
