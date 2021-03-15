@@ -657,7 +657,7 @@ class FcmListenerService : FirebaseMessagingService() {
 
 ## Sample 프로젝트
 
-* 프로젝트명 : TouchAd_Sample_Android
+* 프로젝트명 : aos_touchAd
 * 패키지명 : kr.co.touchad
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
