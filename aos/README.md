@@ -11,13 +11,13 @@
   * FCM Push 기능 : 적립, 통신비 차감, 전면광고 결과화면
 
    ## 매체사 앱 SDK 연동을 위한 업무진행 절차
-  * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
-  * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
-  * 추가코딩 (SDK 초기화, 전면광고적용, FCM 리시버)
-  * FCM 전송 Public Web API(POST 방식) 제작후 광고 SDK 담당자에게 전달
-  * 테스트용 apk 파일 광고 SDK 담당자에게 전달
-  * 광고 SDK 기능테스트 (가입, 적립, 차감, FCM)
-  * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
+  * 광고SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
+  * 광고SDK 라이브러리(.aar) 앱프로젝트 Import.
+  * 추가코딩 (SDK초기화, 전면광고적용, FCM리시버)
+  * FCM전송 Public Web API(POST방식) 제작후 광고SDK담당자에게 전달
+  * 테스트용 apk파일 광고SDK 담당자에게 전달
+  * 광고SDK 기능테스트 (가입,적립,차감,FCM)
+  * 상세한 기술적 내용은 아래 TouchAd SDK구성, TouchAd SDK 설치 가이드를 참고하시기 바랍니다.
 
 
 
@@ -25,12 +25,12 @@
 
 
 
-# TouchAd SDK 구성
+# TouchAd SDK For SKT 구성
 
-* 터치애드 SDK에 대한 설명입니다.
-* 터치애드 SDK For 매체사 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
-* SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 28, compileSdkVersion : 29 (으)로 빌드되었습니다.
+* SKT 버전 터치애드 SDK에 대한 설명입니다.
+* 터치애드 SDK For SKT 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
+* SDK결과물은 확장자 aar 형태로 별도 제공됩니다.
+* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 30, compileSdkVerison : 30 (으)로 빌드되었습니다.
 
 
 
@@ -38,8 +38,8 @@
 
 * 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), FCM 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
 * lib폴더에 신용카드 스캔을 하기위한 card.io-5.5.1.jar 파일을 컴파일 하기위해 dependencies에 선언문이 추가되어 있습니다.
-* buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
-* buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
+* buildTypes에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
+* buildTypes에 consumerProguardFile을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
@@ -49,12 +49,12 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
 
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 28
-        versionCode 1021
+        targetSdkVersion 30
+        versionCode 1001
         versionName "0.0.1"
         multiDexEnabled true
 
@@ -132,7 +132,8 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 **사용자**가 모두 수락할 경우 앱을 계속 진행하게 되며 위 세개의 권한 중 하나라도 거부를 할 경우 ‘모든 권한을 수락하셔야 합니다.’ 라는 토스트가 나타나며 앱을 종료하게 됩니다.
+* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
+  **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 시 참고하시면 됩니다.
 ~~~
 private fun checkRequiredPermission() {
@@ -156,8 +157,6 @@ private fun checkRequiredPermission() {
                 if (grantResults!!.isNotEmpty()) {
                     for (i in grantResults.indices) {
                         if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(applicationContext, "모든 권한을 수락하셔야합니다.", Toast.LENGTH_LONG).show()
-                            finish()
                             break
                         }
                     }
@@ -210,6 +209,9 @@ private fun checkRequiredPermission() {
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
+    <!--미디어 위치 정보 접근 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
     <application
         android:icon="@mipmap/tc_ic_launcher"
         android:label="@string/app_name"
@@ -218,7 +220,8 @@ private fun checkRequiredPermission() {
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme">
+        android:theme="@style/TouchAdTheme"
+        android:requestLegacyExternalStorage="true">
 
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
@@ -254,7 +257,6 @@ private fun checkRequiredPermission() {
         </activity>
 
         <activity android:name="io.card.payment.DataEntryActivity"/>
-        
     </application>
 </manifest>
 ~~~
@@ -263,11 +265,11 @@ private fun checkRequiredPermission() {
 
 ### proguard-rules.pro 파일
 
-* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
+* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
+* 추가로 retrofit2및 glide, stactrace오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
--keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
+   -keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
 -keep class android.support.** { *; }
 -keep class com.google.** { *; }
 -keepparameternames#파라미터 이름을 난독화x
@@ -311,7 +313,7 @@ private fun checkRequiredPermission() {
 
 ### Foreground Service
 
-* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
+* 터치애드는 CPI광고(Cost Per Install) 설치 체크를 위해 CPI광고 참여시 background service를 시작합니다.
 
 * targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
 
@@ -327,11 +329,11 @@ private fun checkRequiredPermission() {
 
 
 
-#  TouchAd SDK 설치 가이드
+#  TouchAd SDK For SKT 설치 가이드
 
-* 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
+* 정상적인 제휴서비스를 위한 SK 텔레콤 버전 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs폴더에 넣어줍니다.
 
 
 
@@ -373,7 +375,7 @@ task clean(type: Delete) {
 }
 ~~~
 
-  2. **build.gradle(app)파일수정**
+  2. **build.gradle(app) 파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
      *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.0’, ext: ’arr’를 추가합니다.
@@ -386,13 +388,13 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 17
-        targetSdkVersion 28
-        versionCode 1021
+        targetSdkVersion 30
+        versionCode 1001
         versionName "0.0.1"
         multiDexEnabled true
     }
@@ -492,7 +494,6 @@ class Builder(private val mbrId: String, private val platformId: String) {
 
 fun setLargeIcon(largeIcon: Int)
 fun setSmallIcon(smallIcon: Int)
-fun setNotiToken(notiToken: String)
 fun setAdsId(adsId: String)
 fun create()
 
@@ -504,12 +505,11 @@ fun create()
 ## 터치애드 초기화
 
 * **앱의 메인화면 진입시 터치애드의 초기화 함수를 호출합니다.**
-
 * **TouchAdPlatform.Builder 클래스를 이용하여 필수 파라미터 및 옵셔널한 파라미터 정보를 설정하여 초기화 함수를 호출합니다.**
 
-*  **(필수) TouchAdPlatform.Builder(mbr_id, platform_id) :**
-**mbr_id** -> SDK의 회원 인덱스 혹은 회원 구분값.  
-**platform_id** -> 터치애드 관리자가 발급한 플랫폼 키값.
+* **(필수) TouchAdPlatform.Builder(mbr_id, platform_id) :**
+  **mbr_id** -> SDK의 회원 인덱스 혹은 회원 구분값.  
+  **platform_id** -> 터치애드 관리자가 발급한 플랫폼 키값.
 
 * **주의** : ***mbr_id, platform_id값은 필수 파라미터이며 둘중에 하나라도 빈값일경우  IllegalStateException이 발생합니다.***
 
@@ -519,8 +519,6 @@ fun create()
 
 * **(옵션) setAdsId** : 등록된 광고를 전송하기 위한 아이디값을 설정해줍니다.  Default 값은 “”(Empty String)입니다.
 
-* **(옵션) setNotiToken** : notification 생성시 사용할 토큰을 설정합니다.  Default 값은 “”(Empty String)입니다.
-
 * **아래는 터치애드 초기화 함수 호출 예시입니다.**
 ~~~
 class MainActivity : AppCompatActivity {
@@ -529,14 +527,12 @@ class MainActivity : AppCompatActivity {
     ……
     var mbrId = BasePreference.getValue(this, BasePreference.MBR_ID, "")!!
     var adsId = BasePreference.getValue(this, BasePreference.ADS_ID, "")!!
-    var notiToken = BasePreference.getValue(this, BasePreference.NOTI_TOKEN, "")!!
-    val builder = mbrId?.let { TouchAdPlatform.Builder(it, Constants.PLATFORM_ID) };
+    val builder = mbrId?.let { TouchAdPlatform.Builder(it, Constants.PLATFORM_ID) }
 
     builder?.setLargeIcon(R.mipmap.tc_ic_launcher)
     builder?.setSmallIcon(R.mipmap.tc_ic_launcher)
     builder?.setAdsId(adsId)
-    builder?.setNotiToken(notiToken)
-    
+
     TouchAdPlatform.initialize(this, builder?.create())
     ……
 }
@@ -546,8 +542,7 @@ class MainActivity : AppCompatActivity {
 
 ##  터치애드 전면광고 화면 시작
 
-* 매체사 앱내에서 특정 트리거(결재완료, 기타 이벤트) 시점에 터치애드의 전면광고 화면을  띄울 때 호출합니다.
-
+* SKT 앱내에서 특정 트리거(결재완료, 기타 이벤트) 시점에 터치애드의 전면광고 화면을  띄울 때 호출합니다.
 * 회원가입된 유저일경우 전면광고 화면으로 이동합니다.
 
 * 비회원일경우 광고플랫폼 등록에 따른 약관 동의 화면이 활성화 됩니다.
@@ -556,14 +551,14 @@ class MainActivity : AppCompatActivity {
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ~~~
-TouchAdPlatform.openTouchAdAdvertise(context);
+TouchAdPlatform.openTouchAdAdvertise(context)
 ~~~
 
 
 
 ##  터치애드 광고 플랫폼 회원 처리 시작
 
-* 매체사 앱 내에서 터치애드 충전소를 선택하여 진입하게 되면, 터치애드 회원가입 여부에 따라  약관동의 확인을 거치거나 충전소 리스트로 바로 진입합니다.
+* SKT 앱 내에서 터치애드 충전소를 선택하여 진입하게 되면, 터치애드 회원가입 여부에 따라  약관동의 확인을 거치거나 충전소 리스트로 바로 진입합니다.
 * **(중요)광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.**
 * 아래는 터치애드 충전소 화면 시작함수 호출 예시입니다.
 ~~~
@@ -575,7 +570,7 @@ TouchAdPlatform.startTouchAdWebview(context)
 ##  터치애드 카드 등록
 
 * 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.
-(**양각 카드 경우 인식률이 떨어질 수 있습니다.**)
+  (**양각 카드 경우 인식률이 떨어질 수 있습니다.**)
 * 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
 * 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 카드스캔(또는 직접입력) 후 등록을 하면 광고참여가 
   가능하게 됩니다.
@@ -662,7 +657,7 @@ class FcmListenerService : FirebaseMessagingService() {
 
 ## Sample 프로젝트
 
-* 프로젝트명 : and_TouchAd
+* 프로젝트명 : TouchAd_Sample_Android
 * 패키지명 : kr.co.touchad
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
