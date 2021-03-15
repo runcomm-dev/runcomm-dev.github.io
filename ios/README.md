@@ -1,4 +1,4 @@
-#  TouchAd SDK  설치 가이드
+#  TouchAd SDK  for SKT 설치 가이드
 
 * 정상적인 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
@@ -29,6 +29,7 @@ end
 ## 권한 설정
 1. **카메라**
 * 교통카드 카메라 인식기능에 카메라 사용권한이 필요합니다.
+* 사용자가 권한을 거부하는 경우 카메라 기능이 동작하지 않습니다.
 * 앱프로젝트 info.plist 에 아래내용을 추가합니다.
 
 | Key | Type | Value |
@@ -61,10 +62,9 @@ public class TASDKManager: NSObject {
 * 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.
 * @param mbrId: 매체사 회원관리번호 (필수)
 * @param platformId: 매체사 플랫폼 고정값  (필수)
-* @param pushToken: 매체사앱 FCM PUSH TOKEN  (선택)
 */
-    func initialize(_ mbrId : String, platformId : String, pushToken : String)
-
+    func initialize(_ mbrId : String, platformId : String)
+    
 /**
 * 터치애드 전면광고 오픈
 * @param userInfo: apns custom data
@@ -87,24 +87,22 @@ public class TASDKManager: NSObject {
 
 **(필수) mbr_id -> 매체사 회원 관리번호**
 **(필수) platform_id -> 터치애드 관리자가 발급한 매체사 구분값**
-**(선택) pushToken -> 매체사앱 FCM 푸시토큰**
 
 * **주의** : ***pushToken 경우 매체사와의 협의결과에 따라 전달 여부 결정*** 
 
 * **아래는 터치애드 초기화 함수 호출 예시입니다.**
 ```
-    //MARK: - Push Token
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
-        if let fcmToken = Messaging.messaging().fcmToken {
-            if let usrIdx = TAGlobalManager.userInfo["usr_idx"] as? Int
-            {
-                let usrIdxStr = String(usrIdx)    
-                TASDKManager.initialize("\(usrIdx)", platformId:"touchad", pushToken:fcmToken)
+    //MARK: - App Launched
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        NetworkRequest.requestLogin(nil, snsId: snsId, sns: sns, id: id , pwd: pwd, pwdDecrytYn: "N", success: { (response) in
+            if let user = response.data?[0] as User? {
+                TAGlobalManager.userInfo = user.toJSON()
                 
+                //FCM토큰을 전달하지 않는 경우 터치애드SDK 초기화
+                TASDKManager.initialize(String(user.usrIdx!), platformId:TAConstants.PLATFORM_ID)
+                                        
             }
-        }
+        })
     }
 ```
 
@@ -185,6 +183,13 @@ TASDKManager.startTouchAdWebview()
   ]
 }
 ```
+
+## 빌드시  주의사항
+
+* 애플 앱스토어 혹은 TestFlight 를 통한 앱배포시에는 x86_64 아키텍쳐 빌드가 제외된 SDK 로 빌드하여야 합니다.
+* armv7, arm64  빌드 SDK :  폴더/ios_touchAd/배포용/TouchadSDK.framework
+* XCode 에뮬레이터를 이용한 앱 개발시에는 x86_64 아키텍쳐 빌드가 포함된 SDK 로 빌드하여야 합니다.
+* armv7, arm64, x86_64 빌드 SDK : 폴더/ios_touchAd/개발용/TouchadSDK.framework
 
 ## Sample 프로젝트
 
