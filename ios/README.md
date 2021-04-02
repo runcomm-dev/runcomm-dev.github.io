@@ -57,24 +57,6 @@ func requestCameraPermission(){
 - 아래 간략한 설명입니다.
 ```
 public class TASDKManager: NSObject {
-  
-~~/**~~
-~~* 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.~~
-~~* @param mbrId: 매체사 회원관리번호 (필수)~~
-~~* @param platformId: 매체사 플랫폼 고정값  (필수)~~
-~~*/~~
-~~func initialize(_ mbrId : String, platformId : String)~~
-    
-~~/**~~
-~~* 터치애드 전면광고 오픈~~
-~~* @param userInfo: apns custom data~~
-~~*/~~
-~~func openAdvertise(_ userInfo: [AnyHashable : Any])~~
-
-~~/**~~
-~~* 터치애드 충전소 화면 시작~~
-~~*/~~    
-~~func startTouchAdWebview()~~
 
 /**
 * 참여적립 화면 시작
@@ -82,7 +64,6 @@ public class TASDKManager: NSObject {
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
 */
 func openMPEarningMenu(_ mbrId : String, adPushYn : String)
-
 
 /**
 * 터치애드 화면 시작
