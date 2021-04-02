@@ -6,18 +6,17 @@
 
   ## 광고전송 SDK 주요기능
   * 모바일 웹 광고 화면 : 일반적인 광고적립 앱 서비스(예:캐시슬라이드)에 사용되는 광고목록화면
-  * SNS 회원가입 : 모바일 웹을 통한 SNS 회원가입
   * SKT 통합 회원 가입 : SKT 통신사를 이용하는 회원 대상
   * FCM Push 기능 : 적립, 통신비 차감, 전면광고 결과화면
 
    ## 매체사 앱 SDK 연동을 위한 업무진행 절차
-  * 광고SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
-  * 광고SDK 라이브러리(.aar) 앱프로젝트 Import.
-  * 추가코딩 (SDK초기화, 전면광고적용, FCM리시버)
-  * FCM전송 Public Web API(POST방식) 제작후 광고SDK담당자에게 전달
-  * 테스트용 apk파일 광고SDK 담당자에게 전달
-  * 광고SDK 기능테스트 (가입,적립,차감,FCM)
-  * 상세한 기술적 내용은 아래 TouchAd SDK구성, TouchAd SDK 설치 가이드를 참고하시기 바랍니다.
+  * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
+  * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
+  * 추가코딩 (SDK 초기화, 전면광고적용, FCM 리시버)
+  * FCM 전송 Public Web API(POST 방식) 제작후 광고 SDK 담당자에게 전달
+  * 테스트용 apk 파일 광고 SDK 담당자에게 전달
+  * 광고 SDK 기능테스트 (가입, 적립, 차감, FCM)
+  * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
 
 
 
@@ -29,8 +28,8 @@
 
 * SKT 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For SKT 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
-* SDK결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 30, compileSdkVerison : 30 (으)로 빌드되었습니다.
+* SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
+* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 30, compileSdkVersion : 30 (으)로 빌드되었습니다.
 
 
 
@@ -38,8 +37,8 @@
 
 * 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), FCM 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
 * lib폴더에 신용카드 스캔을 하기위한 card.io-5.5.1.jar 파일을 컴파일 하기위해 dependencies에 선언문이 추가되어 있습니다.
-* buildTypes에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
-* buildTypes에 consumerProguardFile을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
+* buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
+* buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
@@ -54,7 +53,7 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1001
+        versionCode 1004
         versionName "0.0.1"
         multiDexEnabled true
 
@@ -133,7 +132,7 @@ dependencies {
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
-  **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
+    **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 시 참고하시면 됩니다.
 ~~~
 private fun checkRequiredPermission() {
@@ -157,6 +156,7 @@ private fun checkRequiredPermission() {
                 if (grantResults!!.isNotEmpty()) {
                     for (i in grantResults.indices) {
                         if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
                             break
                         }
                     }
@@ -208,8 +208,8 @@ private fun checkRequiredPermission() {
 
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
-    <!--미디어 위치 정보 접근 권한 // 권한 레벨 : 위험-->
+    
+    <!--외부저장소 접근 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
     <application
@@ -246,7 +246,7 @@ private fun checkRequiredPermission() {
         <!-- 카드등록 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
             android:theme="@style/TouchAdTheme"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateVisible">
         </activity>
 
         <!-- 카드 스캔 화면 -->
@@ -257,6 +257,7 @@ private fun checkRequiredPermission() {
         </activity>
 
         <activity android:name="io.card.payment.DataEntryActivity"/>
+        
     </application>
 </manifest>
 ~~~
@@ -265,11 +266,11 @@ private fun checkRequiredPermission() {
 
 ### proguard-rules.pro 파일
 
-* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 glide, stactrace오류보고에 대한 난독화 예외도 추가합니다.
+* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
+* 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
-   -keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
+-keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
 -keep class android.support.** { *; }
 -keep class com.google.** { *; }
 -keepparameternames#파라미터 이름을 난독화x
@@ -313,7 +314,7 @@ private fun checkRequiredPermission() {
 
 ### Foreground Service
 
-* 터치애드는 CPI광고(Cost Per Install) 설치 체크를 위해 CPI광고 참여시 background service를 시작합니다.
+* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
 
 * targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
 
@@ -331,9 +332,9 @@ private fun checkRequiredPermission() {
 
 #  TouchAd SDK For SKT 설치 가이드
 
-* 정상적인 제휴서비스를 위한 SK 텔레콤 버전 터치애드 SDK 설치과정을 설명합니다.
+* 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -375,7 +376,7 @@ task clean(type: Delete) {
 }
 ~~~
 
-  2. **build.gradle(app) 파일수정**
+  2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
      *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.0’, ext: ’arr’를 추가합니다.
@@ -394,7 +395,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1001
+        versionCode 1004
         versionName "0.0.1"
         multiDexEnabled true
     }
@@ -461,80 +462,20 @@ dependencies {
 object TouchAdPlatform {  
 
 /**
-* 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.
-* @param context, options
+* 터치애드 전면광고 화면 시작
 */
-fun initialize(context: Context?, options: Bundle?)
+fun  openMPAdvertise(context: Context, mbrId: String?, data: String?)
 
 /**
-* 푸시 수신시 호출하는 함수.
-* @param context, data
+* 터치애드 화면 시작
 */
-fun  onMessageReceived(context: Context, data: String?)
+fun  openMPTouchAdMenu(context: Context, mbrId: String?, adPushYn: String?)
 
 /**
-* 터치애드 전면광고 오픈
-* @param context, link
+* 참여적립 화면 시작
 */
-fun  openTouchAdAdvertise(context: Context)
+fun  openMPEarningMenu(context: Context, mbrId: String?, adPushYn: String?) 
 
-/**
-* 터치애드 충전소 화면 시작
-* @param context, link
-*/
-fun  startTouchAdWebview(context: Context) 
-
-}
-
-/**
-* 터치애드 초기화 클래스, (4)터치애드 초기화에 설명
-* @param mbrId, platformId
-*/
-class Builder(private val mbrId: String, private val platformId: String) {
-
-fun setLargeIcon(largeIcon: Int)
-fun setSmallIcon(smallIcon: Int)
-fun setAdsId(adsId: String)
-fun create()
-
-}
-~~~
-
-
-
-## 터치애드 초기화
-
-* **앱의 메인화면 진입시 터치애드의 초기화 함수를 호출합니다.**
-* **TouchAdPlatform.Builder 클래스를 이용하여 필수 파라미터 및 옵셔널한 파라미터 정보를 설정하여 초기화 함수를 호출합니다.**
-
-* **(필수) TouchAdPlatform.Builder(mbr_id, platform_id) :**
-  **mbr_id** -> SDK의 회원 인덱스 혹은 회원 구분값.  
-  **platform_id** -> 터치애드 관리자가 발급한 플랫폼 키값.
-
-* **주의** : ***mbr_id, platform_id값은 필수 파라미터이며 둘중에 하나라도 빈값일경우  IllegalStateException이 발생합니다.***
-
-* **(옵션) setLargeIcon** : 터치애드 관련 푸시 수신시 앱에서 알림을 생성하지 않고, SDK에서 푸시 데이터를 전달 받아 notification을 생성합니다. notification생성시 사용할 largeIcon의 리소스 아이디를 설정합니다. 설정하지 않을시 AndroidManifes application tag의 icon을 largeIcon으로 사용합니다.
-
-* **(옵션) setSmallIcon** : notification 생성시 사용할 smallIcon의 리소스 아이디를 설정합니다. 설정하지 않을 시 AndroidManifest의 icon을 smallIcon으로 사용합니다. (***application tag의 icon이 존재하지 않을경우 터치애드 자체 smallIcon 사용***)
-
-* **(옵션) setAdsId** : 등록된 광고를 전송하기 위한 아이디값을 설정해줍니다.  Default 값은 “”(Empty String)입니다.
-
-* **아래는 터치애드 초기화 함수 호출 예시입니다.**
-~~~
-class MainActivity : AppCompatActivity {
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    ……
-    var mbrId = BasePreference.getValue(this, BasePreference.MBR_ID, "")!!
-    var adsId = BasePreference.getValue(this, BasePreference.ADS_ID, "")!!
-    val builder = mbrId?.let { TouchAdPlatform.Builder(it, Constants.PLATFORM_ID) }
-
-    builder?.setLargeIcon(R.mipmap.tc_ic_launcher)
-    builder?.setSmallIcon(R.mipmap.tc_ic_launcher)
-    builder?.setAdsId(adsId)
-
-    TouchAdPlatform.initialize(this, builder?.create())
-    ……
 }
 ~~~
 
@@ -542,43 +483,50 @@ class MainActivity : AppCompatActivity {
 
 ##  터치애드 전면광고 화면 시작
 
-* SKT 앱내에서 특정 트리거(결재완료, 기타 이벤트) 시점에 터치애드의 전면광고 화면을  띄울 때 호출합니다.
-* 회원가입된 유저일경우 전면광고 화면으로 이동합니다.
-
-* 비회원일경우 광고플랫폼 등록에 따른 약관 동의 화면이 활성화 됩니다.
-
-* ※ 호출전 메인화면에서 initialize함수를 이용하여 **터치애드 초기화**가 이루어져야합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+
+mbrId = 멤버십카드번호, data = 푸시데이터(FCM 항목 참고하시면 됩니다.)
 ~~~
-TouchAdPlatform.openTouchAdAdvertise(context)
-~~~
-
-
-
-##  터치애드 광고 플랫폼 회원 처리 시작
-
-* SKT 앱 내에서 터치애드 충전소를 선택하여 진입하게 되면, 터치애드 회원가입 여부에 따라  약관동의 확인을 거치거나 충전소 리스트로 바로 진입합니다.
-* **(중요)광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.**
-* 아래는 터치애드 충전소 화면 시작함수 호출 예시입니다.
-~~~
-TouchAdPlatform.startTouchAdWebview(context)
+TouchAdPlatform.openMPAdvertise(context, mbrId, data);
 ~~~
 
 
 
-##  터치애드 카드 등록
+##  참여적립 화면 시작
 
-* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.
-  (**양각 카드 경우 인식률이 떨어질 수 있습니다.**)
-* 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
-* 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 카드스캔(또는 직접입력) 후 등록을 하면 광고참여가 
-  가능하게 됩니다.
+*  MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
+
+* 아래는 참여적립 화면 시작함수 호출 예시입니다.
+mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+~~~
+TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn)
+~~~
+
+## 터치애드 화면 시작
+
+*  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+
+* 아래는 터치애드 화면 시작함수 호출 예시입니다.
+mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+~~~
+TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn)
+~~~
+
+##  터치애드 교통카드 등록
+
+* 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
+
+* CardIO 오픈소스 + GoogleVisionAPI 기술을 사용하고 있습니다.
+
+* CardIO 오픈소스는 아파치 라이센스이며 SDK설정화면내 라이센스 사용에 대한 고지를 하였습니다. 
 
 
 
 ##  터치애드 푸시 수신 시
 
+* 터치애드는 푸시 송신 시 MP 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
 * 매체사 앱 Push Receiver에서 터치애드 관련 Push 수신 시, Data Property에 존재하는 터치애드 관련 데이터를 Parsing하여 SDK에 전달합니다.
 *  푸시관련에 대한 세부 내용은 아래 FCM 관련 부분을 참고바랍니다.
 
@@ -590,7 +538,7 @@ TouchAdPlatform.startTouchAdWebview(context)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-"touchad": "{\"title\":\"TOUCHAD\",\"msg\":\"ADVERTISE\",\"touchad\":\"touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190\"}"
+"touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
     }
 ~~~
 
@@ -602,7 +550,7 @@ TouchAdPlatform.startTouchAdWebview(context)
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"title\":\"TOUCHAD\",\"msg\":\"ADVERTISE\",\"touchad\":\"touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190\"}"
+      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
     }
   },
   "apns": {
@@ -618,7 +566,7 @@ TouchAdPlatform.startTouchAdWebview(context)
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190"
+      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
@@ -633,20 +581,23 @@ TouchAdPlatform.startTouchAdWebview(context)
 
 
 
-* 매체사 앱의 Push Receiver에서는 Push 수신 후 data Property에서 파싱한 Json String값을 터치애드SDK의 onMessageReceived함수로 전달후 return합니다.
+* 매체사 앱의 Push Receiver에서는 Push 수신 후 data Property에서 파싱한 String값을 터치애드SDK의 onMessageReceived함수로 전달후 return합니다.
 * 매체사 앱에서 푸시 수신시 Push Receiver 예시입니다.
 ~~~
 class FcmListenerService : FirebaseMessagingService() {  
 
    override fun onMessageReceived(remoteMessage:RemoteMessage) {  
 
-      remoteMessage ?: return
-      
-      val pushData = remoteMessage.data["touchad"]
-      
-      pushData?.let { it:String
-         TouchAdPlatform.onMessageReceived(this, it)  
-      }  
+      val mbrId = "멤버십카드번호"
+        if(mbrId == ""){
+            Toast.makeText(this, R.string.empty_mbr_id, Toast.LENGTH_SHORT).show()
+        }else{
+            val pushData = remoteMessage.data["touchad"]
+            val decodePushData = URLDecoder.decode(pushData, "UTF-8")
+            decodePushData?.let {
+                TouchAdPlatform.openMPAdvertise(this, mbrId, it)
+            }
+        }  
    }  
 }
 ~~~
@@ -657,7 +608,7 @@ class FcmListenerService : FirebaseMessagingService() {
 
 ## Sample 프로젝트
 
-* 프로젝트명 : aos_touchAd
+* 프로젝트명 : and_TouchAd
 * 패키지명 : kr.co.touchad
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
