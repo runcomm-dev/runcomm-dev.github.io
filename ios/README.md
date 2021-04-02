@@ -58,95 +58,104 @@ func requestCameraPermission(){
 ```
 public class TASDKManager: NSObject {
   
-/**
-* 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.
-* @param mbrId: 매체사 회원관리번호 (필수)
-* @param platformId: 매체사 플랫폼 고정값  (필수)
-*/
-    func initialize(_ mbrId : String, platformId : String)
+~~/**~~
+~~* 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.~~
+~~* @param mbrId: 매체사 회원관리번호 (필수)~~
+~~* @param platformId: 매체사 플랫폼 고정값  (필수)~~
+~~*/~~
+~~func initialize(_ mbrId : String, platformId : String)~~
     
-/**
-* 터치애드 전면광고 오픈
-* @param userInfo: apns custom data
-*/
-    func openAdvertise(_ userInfo: [AnyHashable : Any])
+~~/**~~
+~~* 터치애드 전면광고 오픈~~
+~~* @param userInfo: apns custom data~~
+~~*/~~
+~~func openAdvertise(_ userInfo: [AnyHashable : Any])~~
+
+~~/**~~
+~~* 터치애드 충전소 화면 시작~~
+~~*/~~    
+~~func startTouchAdWebview()~~
 
 /**
-* 터치애드 충전소 화면 시작
-*/    
-    func startTouchAdWebview()
+* 참여적립 화면 시작
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+*/
+func openMPEarningMenu(_ mbrId : String, adPushYn : String)
+
+
+/**
+* 터치애드 화면 시작
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+*/
+func openMPTouchadMenu(_ mbrId : String, adPushYn : String)
+
+/**
+* 터치애드 전면광고 오픈
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param userInfo: apns custom data
+*/
+func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 
 }
 ```
 
-## 터치애드 초기화
+~~## 터치애드 초기화~~
 
-* **앱의 메인화면 진입시 터치애드의 초기화 함수를 호출합니다.**
-
-* **TASDKManager.initialize 함수를 이용하여 필수 파라미터 및 옵셔널한 파라미터 정보를 설정하여 초기화 함수를 호출합니다.**
-
-**(필수) mbr_id -> 매체사 회원 관리번호**
-**(필수) platform_id -> 터치애드 관리자가 발급한 매체사 구분값**
-
-* **주의** : ***pushToken 경우 매체사와의 협의결과에 따라 전달 여부 결정*** 
-
-* **아래는 터치애드 초기화 함수 호출 예시입니다.**
-```
-    //MARK: - App Launched
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        NetworkRequest.requestLogin(nil, snsId: snsId, sns: sns, id: id , pwd: pwd, pwdDecrytYn: "N", success: { (response) in
-            if let user = response.data?[0] as User? {
-                TAGlobalManager.userInfo = user.toJSON()
-                
-                //FCM토큰을 전달하지 않는 경우 터치애드SDK 초기화
-                TASDKManager.initialize(String(user.usrIdx!), platformId:TAConstants.PLATFORM_ID)
-                                        
-            }
-        })
-    }
-```
 
 ## 터치애드 전면광고 화면 시작
 
-* 매체사 앱내 특정 이벤트(푸시수신, 결제완료) 발생시점에 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
-
-* 회원가입된 터치애드 유저일경우 전면광고 화면으로 이동합니다.
-
-* 비회원일경우 터치애드 등록에 따른 약관 동의 화면이 활성화 됩니다.
-
-* ※ 호출전 메인화면에서 initialize함수를 이용하여 터치애드 초기화가 이루어져야합니다.
+* MP 지하철 교통카드 태그 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
-TASDKManager.openAdvertise(userInfo)
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo)
+    }
+    completionHandler()
+}
 ```
 
-## 터치애드 광고 플랫폼 회원처리 시작
+~~## 터치애드 광고 플랫폼 회원처리 시작~~
 
-* 매체사 앱 내에서 터치애드 충전소를 선택하여 진입하게 되면, 터치애드 회원가입 여부에 따라 약관동의 확인을 거치거나 충전소 리스트로 바로 진입합니다
 
-* 아래는 터치애드 충전소 화면 시작함수 호출 예시입니다.
+## 참여적립 화면 시작
+
+*MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
+
+* 아래는 참여적립 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.startTouchAdWebview()
+TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y")
 ```
 
-## 터치애드 카드 등록
+## 터치애드 화면 시작
 
-* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.(양각 카드 경우 인식률이 떨어질수 있습니다.)
+*MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
 
-* 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
+* 아래는 터치애드 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y")
+```
 
-* 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 카드스캔(또는 직접입력) 후 등록을 하면 광고참여가 가능하게 됩니다.
+
+## 터치애드 교통카드 등록
+
+* 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
+
+* CardIO 오픈소스 + GoogleVisionAPI 기술을 사용하고 있습니다.
+
+* CardIO 오픈소스는 아파치 라이센스이며 SDK설정화면내 라이센스 사용에 대한 고지를 하였습니다. 
 
 ## FCM 전송
 
-* 터치애드는 푸시 송신 시 앱 제작사에서 제공한 Public API를 이용하여 데이터를 전달하고 제작사 서버에서 앱으로 Push(FCM)을 전송하는 형태입니다.(협의중)
-* Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
+* 터치애드는 푸시 송신 시 MP 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
 * Form파라미터(**필수**)
 
 | 파라미터 | 내용 |
 |---|---|
-| `touchad`|JSON 문자열|
+| `touchad`|문자열|
 
 * API를 통해 Post된 데이터를 FCM데이터 구성요소 중 data와 payload 프로퍼티에 담아서 FCM전송 바랍니다.(※ 변경 가능성 있습니다.)
 
@@ -156,7 +165,7 @@ TASDKManager.startTouchAdWebview()
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"title\":\"TOUCHAD\",\"msg\":\"ADVERTISE\",\"touchad\":\"touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190\"}"
+      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
     }
   },
   "apns": {
@@ -172,7 +181,7 @@ TASDKManager.startTouchAdWebview()
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190"
+      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
