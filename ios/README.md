@@ -51,6 +51,33 @@ func requestCameraPermission(){
     }
 ```
 
+2. **광고식별자(IDFA)**
+* 터치애드는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
+* IOS 14 이상부터 IDFA 를 사용하기 위해선 명시적으로 사용자 동의를 얻어야 합니다.
+* 앱프로젝트 info.plist 에 아래내용을 추가합니다.
+
+| Key | Type | Value |
+|---|---|---|
+| Information Property List|Dictionary|(1 item)|
+| Privacy - Tracking Usage Description|String|앱이 타겟광고게재 목적으로 IDFA에 접근하려고 합니다.|
+
+* 앱프로젝트에서 IDFA 조회를 명시적으로 요청할 경우 아래와 같은 메서드를 작성하여 사용합니다.
+
+```
+func requestPermission() { 
+    ATTrackingManager.requestTrackingAuthorization { status in 
+        switch status { 
+        case .authorized: 
+            print("Authorized") 
+        case .denied: 
+            print("Restricted") 
+        @unknown default: 
+            print("Unknown") 
+        } 
+    } 
+}
+```
+
 ## 터치애드 플랫폼 클래스 함수
 
 - 주요기능을 모듈화하여 Static 함수형태로 호출합니다.
@@ -69,8 +96,9 @@ func openMPEarningMenu(_ mbrId : String, adPushYn : String)
 * 터치애드 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param callback: MP 설정화면 오픈함수 (옵션)
 */
-func openMPTouchadMenu(_ mbrId : String, adPushYn : String)
+func openMPTouchadMenu(_ mbrId : String, adPushYn : String, callback: (() -> Void)?)
 
 /**
 * 터치애드 전면광고 오픈
@@ -87,7 +115,7 @@ func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 
 ## 터치애드 전면광고 화면 시작
 
-*  MP 지하철 교통카드 태그 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
@@ -114,10 +142,14 @@ TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y")
 ## 터치애드 화면 시작
 
 *  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+*  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
+
 
 * 아래는 터치애드 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y")
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y",callback:{() in 
+ //MP 앱내 광고푸시 설정화면 오픈
+})
 ```
 
 
