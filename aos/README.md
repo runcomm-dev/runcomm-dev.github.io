@@ -212,6 +212,9 @@ private fun checkRequiredPermission() {
     <!--외부저장소 접근 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
+    <!--진동 사용 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name = "android.permission.VIBRATE"/>
+    
     <application
         android:icon="@mipmap/tc_ic_launcher"
         android:label="@string/app_name"
@@ -318,7 +321,7 @@ private fun checkRequiredPermission() {
 
 * targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
 
-* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알람창의 notification 형태로 노출됩니다.
+* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
 
 * 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
 
@@ -464,17 +467,17 @@ object TouchAdPlatform {
 /**
 * 터치애드 전면광고 화면 시작
 */
-fun  openMPAdvertise(context: Context, mbrId: String?, data: String?)
+fun  openMPAdvertise(context: Context, mbrId: String, data: String?)
 
 /**
 * 터치애드 화면 시작
 */
-fun  openMPTouchAdMenu(context: Context, mbrId: String?, adPushYn: String?)
+fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String?, callback: (() -> Unit)?)
 
 /**
 * 참여적립 화면 시작
 */
-fun  openMPEarningMenu(context: Context, mbrId: String?, adPushYn: String?) 
+fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String?) 
 
 }
 ~~~
@@ -484,7 +487,8 @@ fun  openMPEarningMenu(context: Context, mbrId: String?, adPushYn: String?)
 ##  터치애드 전면광고 화면 시작
 
 *  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
-
+*  회원가입된 유저일경우 전면광고 화면으로 이동합니다.
+*  비회원일경우 약관 동의 거치고 전면광고 화면으로 이동합니다.
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 
 mbrId = 멤버십카드번호, data = 푸시데이터(FCM 항목 참고하시면 됩니다.)
@@ -508,10 +512,15 @@ TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn)
 
 *  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
 
+*  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
+
 * 아래는 터치애드 화면 시작함수 호출 예시입니다.
-mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.), mpCallback = MP 설정화면 호출을 위한 콜백변수
 ~~~
-TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn)
+mpCallback = {
+    //MP 앱내 광고푸시 설정화면 오픈
+}
+TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, mpCallback)
 ~~~
 
 ##  터치애드 교통카드 등록
