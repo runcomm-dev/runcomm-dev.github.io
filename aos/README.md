@@ -585,7 +585,7 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, m
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
+      "touchad": "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
