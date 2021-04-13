@@ -89,16 +89,20 @@ public class TASDKManager: NSObject {
 * 참여적립 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년 YYYY 4자리 (필수)
 */
-func openMPEarningMenu(_ mbrId : String, adPushYn : String)
+func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
 /**
 * 터치애드 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년 YYYY 4자리 (필수)
 * @param callback: MP 설정화면 오픈함수 (옵션)
 */
-func openMPTouchadMenu(_ mbrId : String, adPushYn : String, callback: (() -> Void)?)
+func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String, callback: (() -> Void)?)
 
 /**
 * 터치애드 전면광고 오픈
@@ -121,7 +125,9 @@ func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
-        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo)
+        
+        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
+        
     }
     completionHandler()
 }
@@ -136,18 +142,19 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 
 * 아래는 참여적립 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y")
+TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "2001")
 ```
 
 ## 터치애드 화면 시작
 
 *  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
 
 
 * 아래는 터치애드 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y",callback:{() in 
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "2001", callback:{() in 
  //MP 앱내 광고푸시 설정화면 오픈
 })
 ```
@@ -178,7 +185,7 @@ TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y",callback:{()
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     }
   },
   "apns": {
@@ -194,7 +201,7 @@ TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y",callback:{()
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
