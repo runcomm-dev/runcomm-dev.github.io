@@ -53,7 +53,7 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1004
+        versionCode 1006
         versionName "0.0.1"
         multiDexEnabled true
 
@@ -398,7 +398,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1004
+        versionCode 1006
         versionName "0.0.1"
         multiDexEnabled true
     }
@@ -467,17 +467,17 @@ object TouchAdPlatform {
 /**
 * 터치애드 전면광고 화면 시작
 */
-fun  openMPAdvertise(context: Context, mbrId: String, data: String?)
+fun  openMPAdvertise(context: Context, mbrId: String, data: String, gender: String?, birthYear: String?)
 
 /**
 * 터치애드 화면 시작
 */
-fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String?, callback: (() -> Unit)?)
+fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?, callback: (() -> Unit)?)
 
 /**
 * 참여적립 화면 시작
 */
-fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String?) 
+fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?) 
 
 }
 ~~~
@@ -489,9 +489,11 @@ fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String?)
 *  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 *  회원가입된 유저일경우 전면광고 화면으로 이동합니다.
 *  비회원일경우 약관 동의 거치고 전면광고 화면으로 이동합니다.
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+*  mbrId = 멤버십카드번호
+*  data = 푸시데이터(FCM 항목 참고하시면 됩니다.)
 
-mbrId = 멤버십카드번호, data = 푸시데이터(FCM 항목 참고하시면 됩니다.)
+*  아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+
 ~~~
 TouchAdPlatform.openMPAdvertise(context, mbrId, data);
 ~~~
@@ -501,26 +503,34 @@ TouchAdPlatform.openMPAdvertise(context, mbrId, data);
 ##  참여적립 화면 시작
 
 *  MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
+* mbrId = 멤버십카드번호
+* adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+*  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
+*  birthYear = 출생년도 YYYY 4자리 
 
 * 아래는 참여적립 화면 시작함수 호출 예시입니다.
-mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+
 ~~~
-TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn)
+TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn, gender, birthYear)
 ~~~
 
 ## 터치애드 화면 시작
 
 *  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
-
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
+* mbrId = 멤버십카드번호
+* adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+*  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
+*  birthYear = 출생년도 YYYY 4자리 
+* mpCallback = MP 설정화면 호출을 위한 콜백변수
 
 * 아래는 터치애드 화면 시작함수 호출 예시입니다.
-mbrId = 멤버십카드번호, adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.), mpCallback = MP 설정화면 호출을 위한 콜백변수
+
 ~~~
 mpCallback = {
     //MP 앱내 광고푸시 설정화면 오픈
 }
-TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, mpCallback)
+TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, mpCallback)
 ~~~
 
 ##  터치애드 교통카드 등록
@@ -547,8 +557,7 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, mpCallback)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-"touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
-    }
+%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -559,7 +568,8 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, mpCallback)
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%3FonOff%3D1%26cd%3D1916%26cardIdx%3D190"
+      "touchad": 
+         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     }
   },
   "apns": {
@@ -598,13 +608,15 @@ class FcmListenerService : FirebaseMessagingService() {
    override fun onMessageReceived(remoteMessage:RemoteMessage) {  
 
       val mbrId = "멤버십카드번호"
+      val gender = "성별"
+      val birthYear = "출생년도"
         if(mbrId == ""){
             Toast.makeText(this, R.string.empty_mbr_id, Toast.LENGTH_SHORT).show()
         }else{
             val pushData = remoteMessage.data["touchad"]
             val decodePushData = URLDecoder.decode(pushData, "UTF-8")
             decodePushData?.let {
-                TouchAdPlatform.openMPAdvertise(this, mbrId, it)
+                TouchAdPlatform.openMPAdvertise(this, mbrId, it, gender, birthYear)
             }
         }  
    }  
