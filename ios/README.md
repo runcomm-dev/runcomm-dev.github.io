@@ -117,9 +117,11 @@ func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 ~~## 터치애드 초기화~~
 
 
-## 터치애드 전면광고 화면 시작
+## 터치애드 전면광고 화면 시작 (백그라운드, IOS >= 10)
 
 *  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+
+*  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 전면광고 화면이 나타납니다.
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
@@ -130,6 +132,39 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         
     }
     completionHandler()
+}
+```
+
+## 터치애드 전면광고 화면 시작 (포그라운드, IOS >= 10)
+
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+
+*  MP 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
+
+* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+```
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    printd("willPresentNotification = \(notification.request.content.userInfo)")
+    
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: notification.request.content.userInfo)
+    
+    completionHandler([.alert, .badge, .sound])
+}
+```
+
+## 터치애드 전면광고 화면 시작 (IOS < 10)
+
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+
+* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+```
+private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    //[AnyHashable : Any]
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
+        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: userInfo)
+    }
+
 }
 ```
 
