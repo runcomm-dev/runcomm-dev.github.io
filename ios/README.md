@@ -90,7 +90,7 @@ public class TASDKManager: NSObject {
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
 * @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
-* @param birthYear: MP 멤버십회원 생년 YYYY 4자리 (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 */
 func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
@@ -99,7 +99,7 @@ func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, bir
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
 * @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
-* @param birthYear: MP 멤버십회원 생년 YYYY 4자리 (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 * @param callback: MP 설정화면 오픈함수 (옵션)
 */
 func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String, callback: (() -> Void)?)
@@ -177,7 +177,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 
 * 아래는 참여적립 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "2001")
+TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
 ```
 
 ## 터치애드 화면 시작
@@ -189,7 +189,7 @@ TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2"
 
 * 아래는 터치애드 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "2001", callback:{() in 
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915", callback:{() in 
  //MP 앱내 광고푸시 설정화면 오픈
 })
 ```
