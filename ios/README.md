@@ -111,6 +111,13 @@ func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, bir
 */
 func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 
+/**
+* 터치애드 참여적립 2차푸시 결과 화면
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param userInfo: apns custom data
+*/
+func openMPEarningResult(_ mbrId : String, userInfo: [AnyHashable : Any])
+
 }
 ```
 
@@ -126,11 +133,9 @@ func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
         
-        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
         
-    }
     completionHandler()
 }
 ```
@@ -161,9 +166,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
     //[AnyHashable : Any]
     
-    DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(2000)) {
-        TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: userInfo)
-    }
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: userInfo)
 
 }
 ```
@@ -186,14 +189,62 @@ TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2"
 
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
 
-
-* 아래는 터치애드 화면 시작함수 호출 예시입니다.
+*  아래는 터치애드 화면 시작함수 호출 예시입니다.
 ```
 TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915", callback:{() in 
  //MP 앱내 광고푸시 설정화면 오픈
 })
 ```
 
+## 참여적립 2차 푸시 결과 화면 (백그라운드, IOS >= 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 화면이 나타납니다.
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
+        
+    completionHandler()
+}
+```
+
+## 참여적립 2차 푸시 결과 화면 (포그라운드, IOS >= 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  MP 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    printd("willPresentNotification = \(notification.request.content.userInfo)")
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: notification.request.content.userInfo)
+    
+    completionHandler([.alert, .badge, .sound])
+}
+```
+
+## 참여적립 2차 푸시 결과 화면 (IOS < 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    //[AnyHashable : Any]
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: userInfo)
+
+}
+```
 
 ## 터치애드 교통카드 등록
 
