@@ -54,7 +54,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 30
         versionCode 1006
-        versionName "0.0.1"
+        versionName "1.0"
         multiDexEnabled true
 
     }
@@ -214,7 +214,10 @@ private fun checkRequiredPermission() {
 
     <!--진동 사용 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name = "android.permission.VIBRATE"/>
-    
+
+    <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
     <application
         android:icon="@mipmap/tc_ic_launcher"
         android:label="@string/app_name"
@@ -399,7 +402,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 30
         versionCode 1006
-        versionName "0.0.1"
+        versionName "1.0"
         multiDexEnabled true
     }
 
@@ -467,18 +470,22 @@ object TouchAdPlatform {
 /**
 * 터치애드 전면광고 화면 시작
 */
-fun  openMPAdvertise(context: Context, mbrId: String, data: String, gender: String?, birthYear: String?)
+fun  openMPAdvertise(context: Context, mbrId: String, data: String, gender: String, birthYear: String)
 
 /**
 * 터치애드 화면 시작
 */
-fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?, callback: (() -> Unit)?)
+fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String, gender: String, birthYear: String, callback: (() -> Unit)?)
 
 /**
 * 참여적립 화면 시작
 */
-fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?) 
+fun  openMPEarningMenu(context: Context, mbrId: String, adPushYn: String, gender: String, birthYear: String) 
 
+/**
+* 참여적립 2차푸시 결과 화면 시작
+*/
+fun  openMPEarningResult(context: Context, mbrId: String, data: String)
 }
 ~~~
 
@@ -503,28 +510,30 @@ TouchAdPlatform.openMPAdvertise(context, mbrId, data);
 ##  참여적립 화면 시작
 
 *  MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
-* mbrId = 멤버십카드번호
-* adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+*  mbrId = 멤버십카드번호
+*  adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
 *  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
-*  birthYear = 출생년도 YYYY 4자리 
+*  birthYear = 생년월일 YYMMDD 6자리 
 
-* 아래는 참여적립 화면 시작함수 호출 예시입니다.
+*  아래는 참여적립 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn, gender, birthYear)
 ~~~
 
+
+
 ## 터치애드 화면 시작
 
 *  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
-* mbrId = 멤버십카드번호
-* adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+*  mbrId = 멤버십카드번호
+*  adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
 *  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
-*  birthYear = 출생년도 YYYY 4자리 
-* mpCallback = MP 설정화면 호출을 위한 콜백변수
+*  birthYear = 생년월일 YYMMDD 6자리 
+*  mpCallback = MP 설정화면 호출을 위한 콜백변수
 
-* 아래는 터치애드 화면 시작함수 호출 예시입니다.
+*  아래는 터치애드 화면 시작함수 호출 예시입니다.
 
 ~~~
 mpCallback = {
@@ -532,6 +541,23 @@ mpCallback = {
 }
 TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, mpCallback)
 ~~~
+
+
+
+## 참여적립 2차 푸시 결과 화면
+
+*  참여적립 메뉴에서 광고를 이용한 뒤 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다.
+*  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 화면이 나타납니다.
+*  mbrId = 멤버십카드번호
+*  data = 2차푸시푸시데이터(예시 : "{\"dalcoin\": \"600\", \"platformId\" : \"SKTE\"}")
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openMPEarningResult(context, mbrId, data)
+~~~
+
+
 
 ##  터치애드 교통카드 등록
 
@@ -547,7 +573,7 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, m
 
 * 터치애드는 푸시 송신 시 MP 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
 * 매체사 앱 Push Receiver에서 터치애드 관련 Push 수신 시, Data Property에 존재하는 터치애드 관련 데이터를 Parsing하여 SDK에 전달합니다.
-*  푸시관련에 대한 세부 내용은 아래 FCM 관련 부분을 참고바랍니다.
+* 푸시관련에 대한 세부 내용은 아래 FCM 관련 부분을 참고바랍니다.
 
 
 
@@ -585,7 +611,8 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, m
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+      "touchad": 
+		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
@@ -607,18 +634,46 @@ class FcmListenerService : FirebaseMessagingService() {
 
    override fun onMessageReceived(remoteMessage:RemoteMessage) {  
 
-      val mbrId = "멤버십카드번호"
-      val gender = "성별"
-      val birthYear = "출생년도"
-        if(mbrId == ""){
-            Toast.makeText(this, R.string.empty_mbr_id, Toast.LENGTH_SHORT).show()
-        }else{
-            val pushData = remoteMessage.data["touchad"]
-            val decodePushData = URLDecoder.decode(pushData, "UTF-8")
-            decodePushData?.let {
-                TouchAdPlatform.openMPAdvertise(this, mbrId, it, gender, birthYear)
-            }
-        }  
+      val mbrId : String = 멤버십 카드번호
+      val gender = "1" //남성=1, 여성=2(2000년대 이후 남성=3, 여성=4)
+      val birthYear = "950512" //yymmdd
+      if(mbrId.isNullOrEmpty()){
+          Toast.makeText(this, R.string.empty_mbr_id, Toast.LENGTH_SHORT).show()
+      }else{
+          val pushData : String? = remoteMessage.data["touchad"]
+          if(pushData.isNullOrEmpty()){
+              Toast.makeText(this, R.string.null_data, Toast.LENGTH_SHORT).show()
+          }else{
+              val decodePushData = URLDecoder.decode(pushData, "UTF-8")
+              
+              //1차푸시
+              decodePushData?.let {
+                  //decodePushData json.favinet 값존재할경우 함수 호출
+                  val json = JSONObject(decodePushData)
+                  val favinet = json.getString("favinet")
+                  
+                  if favinet != null
+                  {
+                     TouchAdPlatform.openMPAdvertise(this, mbrId, it, gender, birthYear)
+                  }
+              }
+              
+              //2차 푸시
+              decodePushData?.let {
+                  //decodePushData json.dalcoin 값존재하고  json.platformId == "SKTE" 일경우 함수 호출
+                  val json = JSONObject(decodePushData)
+                  val dalcoin = json.getString("dalcoin")
+                  val platformId = json.getString("platformId")
+                  
+                  if dalcoin != null && platformId == "SKTE"
+                  {
+                    TouchAdPlatform.openMPEarningResult(this, mbrId, it)
+                  }
+              }
+              
+          }
+
+      }  
    }  
 }
 ~~~
