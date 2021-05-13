@@ -1,8 +1,11 @@
-#  TouchAd SDK  설치 가이드
+#  TouchAd SDK  for SKT 설치 가이드
 
 * 정상적인 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 Frameworks폴더에 위치시켜 줍니다.
+* 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
+* 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.framework폴더를 선택합니다.
+* Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.framework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
+
 
 ## CocoaPods 설정
 1. **Podfile 파일수정**
@@ -10,18 +13,69 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '9.0'
 use_frameworks!
 
-target 'Your Target Name' do
+target 'TouchadSDK' do
 
-  pod 'SnapKit'
-  pod 'ChannelIO'
-  pod 'KeychainItemWrapper'
+  pod 'SnapKit', '~> 4.0.0'
+  pod 'Alamofire', '~> 4.8.2'
   pod 'ObjectMapper'
-  pod 'Kingfisher'
+  pod 'JWTDecode', '~> 2.4'
   
 end
+```
+
+## 권한 설정
+1. **카메라**
+* 교통카드 카메라 인식기능에 카메라 사용권한이 필요합니다.
+* 사용자가 권한을 거부하는 경우 카메라 기능이 동작하지 않습니다.
+* 앱프로젝트 info.plist 에 아래내용을 추가합니다.
+
+| Key | Type | Value |
+|---|---|---|
+| Information Property List|Dictionary|(1 item)|
+| Privacy - Camera Usage Description|String|교통카드 사진촬영을 위해 필요합니다.|
+
+* 앱프로젝트에서 카메라 권한을 직접 설정할 경우 아래와 같은 메서드를 작성하여 사용합니다.
+
+```
+func requestCameraPermission(){
+        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
+            if granted {
+                print("Camera: 권한 허용")
+            } else {
+                print("Camera: 권한 거부")
+            }
+        })
+    }
+```
+
+2. **광고식별자(IDFA)**
+* 터치애드는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
+* IOS 14 이상부터 IDFA 를 사용하기 위해선 명시적으로 사용자 동의를 얻어야 합니다.
+* 앱프로젝트 info.plist 에 아래내용을 추가합니다.
+
+| Key | Type | Value |
+|---|---|---|
+| Information Property List|Dictionary|(1 item)|
+| Privacy - Tracking Usage Description|String|앱이 타겟광고게재 목적으로 IDFA에 접근하려고 합니다.|
+
+* 앱프로젝트에서 IDFA 조회를 명시적으로 요청할 경우 아래와 같은 메서드를 작성하여 사용합니다.
+
+```
+func requestPermission() { 
+    ATTrackingManager.requestTrackingAuthorization { status in 
+        switch status { 
+        case .authorized: 
+            print("Authorized") 
+        case .denied: 
+            print("Restricted") 
+        @unknown default: 
+            print("Unknown") 
+        } 
+    } 
+}
 ```
 
 ## 터치애드 플랫폼 클래스 함수
@@ -30,97 +84,184 @@ end
 - 아래 간략한 설명입니다.
 ```
 public class TASDKManager: NSObject {
-  
+
 /**
-* 터치애드 초기화 함수. 메인 액티비티 진입시 최초 호출한다.
-* @param mbrId, platformId, pushToken
+* 참여적립 화면 시작
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 */
-    func initialize(_ mbrId : String, platformId : String, pushToken : String)
+func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
+
+/**
+* 터치애드 화면 시작
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
+* @param callback: MP 설정화면 오픈함수 (옵션)
+*/
+func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String, callback: (() -> Void)?)
 
 /**
 * 터치애드 전면광고 오픈
-* @param notification
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param userInfo: apns custom data
 */
-    func openAdvertise(_ notification: UNNotification)
+func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 
 /**
-* 터치애드 충전소 화면 시작
-*/    
-    func startTouchAdWebview()
+* 터치애드 참여적립 2차푸시 결과 화면
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param userInfo: apns custom data
+*/
+func openMPEarningResult(_ mbrId : String, userInfo: [AnyHashable : Any])
 
 }
 ```
 
-## 터치애드 초기화
+~~## 터치애드 초기화~~
 
-* **앱의 메인화면 진입시 터치애드의 초기화 함수를 호출합니다.**
 
-* **TASDKManager.initialize 함수를 이용하여 필수 파라미터 및 옵셔널한 파라미터 정보를 설정하여 초기화 함수를 호출합니다.**
+## 터치애드 전면광고 화면 시작 (백그라운드, IOS >= 10)
 
-**(필수) mbr_id -> 매체사 회원 식별키**
-**(필수) platform_id -> 터치애드 관리자가 발급한 매체사 구분값**
-**(옵션) pushToken -> 푸시토큰**
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
-* **주의** : ***pushToken 경우 매체사와의 협의결과에 따라 전달 여부 결정*** 
-
-* **아래는 터치애드 초기화 함수 호출 예시입니다.**
-```
-    //MARK: - Push Token
-    
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        Messaging.messaging().setAPNSToken(deviceToken, type: .prod)
-        if let fcmToken = Messaging.messaging().fcmToken {
-            if let usrIdx = TAGlobalManager.userInfo["usr_idx"] as? Int
-            {
-                let usrIdxStr = String(usrIdx)    
-                TASDKManager.initialize("\(usrIdx)", platformId:"touchad", pushToken:fcmToken)
-                
-            }
-        }
-    }
-```
-
-## 터치애드 전면광고 화면 시작
-
-* 매체사 앱내 특정 이벤트(푸시수신, 결제완료) 발생시점에 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
-
-* 회원가입된 터치애드 유저일경우 전면광고 화면으로 이동합니다.
-
-* 비회원일경우 터치애드 등록에 따른 약관 동의 화면이 활성화 됩니다.
-
-* ※ 호출전 메인화면에서 initialize함수를 이용하여 터치애드 초기화가 이루어져야합니다.
+*  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 전면광고 화면이 나타납니다.
 
 * 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
-TASDKManager.openAdvertise(notification)
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
+        
+    completionHandler()
+}
 ```
 
-## 터치애드 광고 플랫폼 회원처리 시작
+## 터치애드 전면광고 화면 시작 (포그라운드, IOS >= 10)
 
-* 매체사 앱 내에서 터치애드 충전소를 선택하여 진입하게 되면, 터치애드 회원가입 여부에 따라 약관동의 확인을 거치거나 충전소 리스트로 바로 진입합니다
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
-* 아래는 터치애드 충전소 화면 시작함수 호출 예시입니다.
+*  MP 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
+
+* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 ```
-TASDKManager.startTouchAdWebview()
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    printd("willPresentNotification = \(notification.request.content.userInfo)")
+    
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: notification.request.content.userInfo)
+    
+    completionHandler([.alert, .badge, .sound])
+}
 ```
 
-## 터치애드 카드 등록
+## 터치애드 전면광고 화면 시작 (IOS < 10)
 
-* 카드등록을 하기 전에 카드를 카메라에 스캔하여 자동으로 입력하는 기능이 들어있습니다.(현재 양각 카드만 스캔이 가능하며 양각이외의 카드 스캔기능이 추가될 수 있습니다.)
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 
-* 광고 플랫폼의 광고 참여는 카드등록이 되어야 참여를 할 수 있습니다.
+* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+```
+private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    //[AnyHashable : Any]
+    
+    TASDKManager.openMPAdvertise("멤버십카드번호", userInfo: userInfo)
 
-* 광고 리스트 화면 우측상단의 메뉴버튼을 누르면 MyPage로 이동하게 되며 카드등록에 진입하여 카드스캔(또는 직접입력) 후 등록을 하면 광고참여가 가능하게 됩니다.
+}
+```
+
+~~## 터치애드 광고 플랫폼 회원처리 시작~~
+
+
+## 참여적립 화면 시작
+
+*  MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
+
+* 아래는 참여적립 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
+```
+
+## 터치애드 화면 시작
+
+*  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+
+*  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
+
+*  아래는 터치애드 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915", callback:{() in 
+ //MP 앱내 광고푸시 설정화면 오픈
+})
+```
+
+## 참여적립 2차 푸시 결과 화면 (백그라운드, IOS >= 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 화면이 나타납니다.
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: response.notification.request.content.userInfo)
+        
+    completionHandler()
+}
+```
+
+## 참여적립 2차 푸시 결과 화면 (포그라운드, IOS >= 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  MP 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    printd("willPresentNotification = \(notification.request.content.userInfo)")
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: notification.request.content.userInfo)
+    
+    completionHandler([.alert, .badge, .sound])
+}
+```
+
+## 참여적립 2차 푸시 결과 화면 (IOS < 10)
+
+*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다. 
+
+*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
+```
+private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    //[AnyHashable : Any]
+    
+    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'SKTE' 값일때 호출합니다.
+    TASDKManager.openMPEarningResult("멤버십카드번호", userInfo: userInfo)
+
+}
+```
+
+## 터치애드 교통카드 등록
+
+* 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
+
+* CardIO 오픈소스 + GoogleVisionAPI 기술을 사용하고 있습니다.
+
+* CardIO 오픈소스는 아파치 라이센스이며 SDK설정화면내 라이센스 사용에 대한 고지를 하였습니다. 
 
 ## FCM 전송
 
-* 터치애드는 푸시 송신 시 앱 제작사에서 제공한 Public API를 이용하여 데이터를 전달하고 제작사 서버에서 앱으로 Push(FCM)을 전송하는 형태입니다.(협의중)
-* Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
+* 터치애드는 푸시 송신 시 MP 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
 * Form파라미터(**필수**)
 
 | 파라미터 | 내용 |
 |---|---|
-| `touchad`|JSON 문자열|
+| `touchad`|문자열|
 
 * API를 통해 Post된 데이터를 FCM데이터 구성요소 중 data와 payload 프로퍼티에 담아서 FCM전송 바랍니다.(※ 변경 가능성 있습니다.)
 
@@ -130,7 +271,7 @@ TASDKManager.startTouchAdWebview()
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"title\":\"TOUCHAD\",\"msg\":\"ADVERTISE\",\"touchad\":\"touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190\"}"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     }
   },
   "apns": {
@@ -146,7 +287,7 @@ TASDKManager.startTouchAdWebview()
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "touchad://ta.runcomm.co.kr/srv/advertise/mobile/select?onOff=1&cd=1916&cardIdx=190"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
@@ -158,8 +299,16 @@ TASDKManager.startTouchAdWebview()
 }
 ```
 
+## 빌드시  주의사항
+
+* 애플 앱스토어 혹은 TestFlight 를 통한 앱배포시에는 x86_64 아키텍쳐 빌드가 제외된 SDK 로 빌드하여야 합니다.
+* armv7, arm64  빌드 SDK :  폴더/ios_touchAd_sdk/배포용/TouchadSDK.framework
+* XCode 에뮬레이터를 이용한 앱 개발시에는 x86_64 아키텍쳐 빌드가 포함된 SDK 로 빌드하여야 합니다.
+* armv7, arm64, x86_64 빌드 SDK : 폴더/ios_touchAd_sdk/개발용/TouchadSDK.framework
+
 ## Sample 프로젝트
 
-* 프로젝트명 : TouchAd_IOS
+* 프로젝트명 : ios_touchAd
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
+
