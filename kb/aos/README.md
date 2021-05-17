@@ -29,7 +29,7 @@
 
 ### SDK build.gradle(app)
 
-* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), FCM 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
+* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 자바비동기 이벤트 기반 라이브러리(rxjava2)</b>를 사용합니다.
 * buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
 * buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
@@ -46,7 +46,7 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1006
+        versionCode 1009
         versionName "1.0"
         multiDexEnabled true
 
@@ -75,7 +75,7 @@ android {
     //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 명시를 해 주어야
     // Android Studio에서 Run이 정상 동작을 한다.
     //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
-    flavorDimensions "flavors"
+    /*flavorDimensions "flavors"
     productFlavors{
         dev{
             dimension "flavors"
@@ -84,7 +84,7 @@ android {
             dimension "flavors"
         }
 
-    }
+    }*/
 
     compileOptions {
         sourceCompatibility 1.8
@@ -107,14 +107,9 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
-    compile files('libs/card.io-5.5.1.jar')
-    implementation 'com.google.firebase:firebase-messaging:20.2.1'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
-
 }
 ~~~
 
@@ -126,45 +121,17 @@ dependencies {
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 SYSTEM_ALERT_WINDOW와 같이 **특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 다른 앱 위에 그리기 권한을 요청합니다. 
     **사용자**가 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
-* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
+* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val canDrawble = Settings.canDrawOverlays(context)
+        if (!canDrawble) {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+            startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
         }
-        permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
-        if (permissionHelper!!.checkPermissionInApp()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val canDrawble = Settings.canDrawOverlays(context)
-                if (!canDrawble) {
-                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                    startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                }
-            }
-            return
-        }
-        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
-                if (grantResults!!.isNotEmpty()) {
-                    for (i in grantResults.indices) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
-                            break
-                        }
-                    }
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val canDrawble = Settings.canDrawOverlays(context)
-                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                    }
-                }
-            }
-        })
     }
+}
 ~~~
 
 
@@ -190,26 +157,15 @@ private fun checkRequiredPermission() {
 
     <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 	
-	<!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
+	<!--Task 정보를 구하는 권한, 21버전 미만 통화상태 확인하기 위해 사용 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
-	
-    <uses-feature android:name="android.hardware.camera.any" />
-
-    <!--카메라 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.CAMERA" />
 
     <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    
-    <!--외부저장소 접근 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
     <!--진동 사용 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name = "android.permission.VIBRATE"/>
@@ -225,8 +181,7 @@ private fun checkRequiredPermission() {
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme"
-        android:requestLegacyExternalStorage="true">
+        android:theme="@style/TouchAdTheme">
 
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
@@ -243,22 +198,9 @@ private fun checkRequiredPermission() {
             android:theme="@style/TouchAdTheme">
         </activity>
 
-        <!-- 전체 광고 화면 -->
+        <!-- 전면 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
             android:theme="@style/TouchAdTheme">
-        </activity>
-
-        <!-- 카드등록 화면 -->
-        <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
-            android:theme="@style/TouchAdTheme"
-            android:windowSoftInputMode="stateVisible">
-        </activity>
-
-        <!-- 카드 스캔 화면 -->
-        <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardScanActivity"
-            android:theme="@style/TouchAdTheme"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait">
         </activity>
 
         <activity android:name="io.card.payment.DataEntryActivity"/>
@@ -341,38 +283,37 @@ private fun checkRequiredPermission() {
 ## build.gradle 설정 
 
   1. **build.gradle(project)파일수정**
-     * firebase를 사용하기 위해 아래 dependencies의 calsspath에 google-services와 firebase-crashlytics를 추가합니다.
-     * allprojects안의 repositories에 maven내용을 추가합니다.
-     * 아래는 실제 작성된 예시입니다.
+     *      * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
+            * allprojects안의 repositories에 maven내용을 추가합니다.
+            * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
+            * 아래는 실제 작성된 예시입니다.
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
-        classpath 'com.google.gms:google-services:4.2.0'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
-        //classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+   repositories {
+       google()
+       jcenter()
+   }
+   dependencies {
+       classpath 'com.android.tools.build:gradle:4.0.1'
+       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
+       classpath 'com.google.gms:google-services:4.2.0'
+       // NOTE: Do not place your application dependencies here; they belong
+       // in the individual module build.gradle files
+   }
 }
 
 allprojects {
-    repositories {
-        maven { url 'https://maven.google.com'}
+   repositories {
+       maven { url 'https://maven.google.com'}
 
-        jcenter()
-        google()
-    }
+       jcenter()
+       google()
+   }
 }
 
 task clean(type: Delete) {
-    delete rootProject.buildDir
+   delete rootProject.buildDir
 }
 ~~~
 
@@ -386,7 +327,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 30
@@ -395,7 +335,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1006
+        versionCode 1009
         versionName "1.0"
         multiDexEnabled true
     }
@@ -440,14 +380,12 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
 
     implementation name: 'touchad-sdk-1.0.0', ext: 'aar'
-    
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.0'
 }
 ~~~
 
