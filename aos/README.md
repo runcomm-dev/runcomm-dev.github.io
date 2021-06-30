@@ -19,11 +19,6 @@
   * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
 
 
-
-
-
-
-
 # TouchAd SDK For SKT 구성
 
 * SKT 버전 터치애드 SDK에 대한 설명입니다.
@@ -35,7 +30,7 @@
 
 ### SDK build.gradle(app)
 
-* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), FCM 이벤트로그(firebase), 자바비동기 이벤트 기반 라이브러리(rxjava2), Firebase 디버깅 라이브러리(crashlytics)</b>를 사용합니다.
+* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 자바비동기 이벤트 기반 라이브러리(rxjava2)</b>를 사용합니다.
 * lib폴더에 신용카드 스캔을 하기위한 card.io-5.5.1.jar 파일을 컴파일 하기위해 dependencies에 선언문이 추가되어 있습니다.
 * buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
 * buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
@@ -115,11 +110,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
     compile files('libs/card.io-5.5.1.jar')
-    implementation 'com.google.firebase:firebase-messaging:20.2.1'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
 
 }
@@ -131,9 +123,9 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 인트로 화면이 끝나고 가이드 화면이 시작될 때 샘플 프로젝트 GuideActivity의 checkRequiredPermission() 함수 내에서 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
+* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
     **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
-* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 시 참고하시면 됩니다.
+* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
@@ -141,15 +133,17 @@ private fun checkRequiredPermission() {
         }
         permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
         if (permissionHelper!!.checkPermissionInApp()) {
-            val canDrawble = Settings.canDrawOverlays(this@GuideActivity)
-            if (!canDrawble) {
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val canDrawble = Settings.canDrawOverlays(context)
+                if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                    startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+                }
             }
             return
         }
-        permissionHelper!!.requestPermission(0, object : PermissionCallback {
-            @RequiresApi(api = Build.VERSION_CODES.M)
+        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
+
             override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
                 mPermissions = permissions as Array<String?>
                 mGrantResults = grantResults
@@ -161,10 +155,13 @@ private fun checkRequiredPermission() {
                         }
                     }
                 }
-                val canDrawble = Settings.canDrawOverlays(this@GuideActivity)
-                if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                    startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val canDrawble = Settings.canDrawOverlays(context)
+                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+                    }
                 }
             }
         })
@@ -197,6 +194,9 @@ private fun checkRequiredPermission() {
 
     <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    
+    <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
+    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <uses-feature android:name="android.hardware.camera.any" />
 
@@ -276,7 +276,7 @@ private fun checkRequiredPermission() {
 * 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
--keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
+-keep class kr.co.touchad.sdk.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
 -keep class android.support.** { *; }
 -keep class com.google.** { *; }
 -keepparameternames#파라미터 이름을 난독화x
@@ -294,6 +294,35 @@ private fun checkRequiredPermission() {
 -dontwarn retrofit2.Platform$Java8
 -keepattributes Signature
 -keepattributes Exceptions
+
+##---------------Begin: proguard configuration for Gson  ----------
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-dontwarn sun.misc.**
+#-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { <fields>; }
+
+# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+##---------------End: proguard configuration for Gson  ----------
 
 # glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
@@ -347,25 +376,24 @@ private fun checkRequiredPermission() {
 ## build.gradle 설정 
 
   1. **build.gradle(project)파일수정**
-     * firebase를 사용하기 위해 아래 dependencies의 calsspath에 google-services와 firebase-crashlytics를 추가합니다.
+     * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
      * allprojects안의 repositories에 maven내용을 추가합니다.
+     * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
      * 아래는 실제 작성된 예시입니다.
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
-        classpath 'com.google.gms:google-services:4.2.0'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
-        //classpath "org.jetbrains.dokka:dokka-android-gradle-plugin:0.9.18"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+   repositories {
+       google()
+       jcenter()
+   }
+   dependencies {
+       classpath 'com.android.tools.build:gradle:4.0.1'
+       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
+       classpath 'com.google.gms:google-services:4.2.0'
+       // NOTE: Do not place your application dependencies here; they belong
+       // in the individual module build.gradle files
+   }
 }
 
 allprojects {
@@ -392,7 +420,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 30
@@ -446,11 +473,9 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
-    implementation 'com.google.firebase:firebase-crashlytics:17.2.2'
 
     implementation name: 'touchad-sdk-1.0.0', ext: 'aar'
-    
-    implementation 'com.google.firebase:firebase-analytics:17.2.0'
+
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
     implementation 'com.android.support:multidex:1.0.3'
@@ -647,7 +672,7 @@ class FcmListenerService : FirebaseMessagingService() {
               
               //1차푸시
               decodePushData?.let {
-                  //decodePushData json.favinet 값존재할경우 함수 호출
+                  //decodePushData json.touchad 값존재할경우 함수 호출
                   val json = JSONObject(decodePushData)
                   val touchad = json.getString("touchad")
                   
