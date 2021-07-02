@@ -324,47 +324,6 @@ private fun checkRequiredPermission() {
 
 ##---------------End: proguard configuration for Gson  ----------
 
-##---------------Begin: proguard configuration for card.io  ----------
-
-# ---- REQUIRED card.io CONFIG ----------------------------------------
-# card.io is a native lib, so anything crossing JNI must not be changed
-
-# Don't obfuscate DetectionInfo or public fields, since
-# it is used by native methods
--keep class io.card.payment.DetectionInfo
--keepclassmembers class io.card.payment.DetectionInfo {
-    public *;
-}
-
--keep class io.card.payment.CreditCard
--keep class io.card.payment.CreditCard$1
--keepclassmembers class io.card.payment.CreditCard {
-  *;
-}
-
--keepclassmembers class io.card.payment.CardScanner {
-  *** onEdgeUpdate(...);
-}
-
-# Don't mess with classes with native methods
-
--keepclasseswithmembers class * {
-    native <methods>;
-}
-
--keepclasseswithmembernames class * {
-    native <methods>;
-}
-
--keep public class io.card.payment.* {
-    public protected *;
-}
-
-# required to suppress errors when building on android 22
--dontwarn io.card.payment.CardIOActivity
-
-##---------------End: proguard configuration for card.io  ------------
-
 # glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
 -keep public class * extends com.bumptech.glide.module.AppGlideModule
@@ -398,7 +357,7 @@ private fun checkRequiredPermission() {
 
 * 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
 
-     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://lh5.googleusercontent.com/GHExixOTfH_DnR__bCkyYx8roKyzjRN1jSPWfysLy00C44CT7P8OuGUyyOZgYyy8_ZF6Gc6Z-p0GmDs3aBCOzHiw_XKK_ZdRmVe7VEMFXRLG3X9Lebb4vRJ9rcDa6k3ztx5k7yBF)
+     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
 
 
 
