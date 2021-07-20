@@ -48,7 +48,7 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1006
+        versionCode 1013
         versionName "1.0"
         multiDexEnabled true
 
@@ -107,8 +107,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
     compile files('libs/card.io-5.5.1.jar')
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
@@ -469,7 +469,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 30
-        versionCode 1006
+        versionCode 1013
         versionName "1.0"
         multiDexEnabled true
     }
@@ -505,8 +505,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
