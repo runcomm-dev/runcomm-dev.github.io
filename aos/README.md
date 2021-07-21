@@ -232,11 +232,10 @@ private fun checkRequiredPermission() {
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
             android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="kr.co.touchad.ui.service" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:protectionLevel="signature">
         </service>
 
         <!-- 웹뷰화면 -->
