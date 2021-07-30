@@ -23,7 +23,7 @@
 * KB 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For KB 리브메이트 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 30, compileSdkVersion : 30 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 30, compileSdkVersion : 30 (으)로 빌드되었습니다.
 
 
 
@@ -44,9 +44,9 @@ android {
     compileSdkVersion 30
 
     defaultConfig {
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1009
+        versionCode 1002
         versionName "1.0"
         multiDexEnabled true
 
@@ -105,8 +105,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -186,11 +186,10 @@ private fun checkRequiredPermission() {
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
             android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="kr.co.touchad.ui.service" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:protectionLevel="signature">
         </service>
 
         <!-- 웹뷰화면 -->
@@ -202,8 +201,6 @@ private fun checkRequiredPermission() {
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
             android:theme="@style/TouchAdTheme">
         </activity>
-
-        <activity android:name="io.card.payment.DataEntryActivity"/>
         
     </application>
 </manifest>
@@ -214,7 +211,7 @@ private fun checkRequiredPermission() {
 ### proguard-rules.pro 파일
 
 * jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
+* 추가로 retrofit2및 stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
 -keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
@@ -236,13 +233,35 @@ private fun checkRequiredPermission() {
 -keepattributes Signature
 -keepattributes Exceptions
 
-# glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public class * extends com.bumptech.glide.module.AppGlideModule
--keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
- **[] $VALUES;
- public *;
+##---------------Begin: proguard configuration for Gson  ----------
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-dontwarn sun.misc.**
+#-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { <fields>; }
+
+# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
 }
+
+##---------------End: proguard configuration for Gson  ----------
+
 -keepclassmembers enum * {
    public static **[] values();
    public static ** valueOf(java.lang.String);
@@ -269,7 +288,8 @@ private fun checkRequiredPermission() {
 
 * 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
 
-     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://lh5.googleusercontent.com/GHExixOTfH_DnR__bCkyYx8roKyzjRN1jSPWfysLy00C44CT7P8OuGUyyOZgYyy8_ZF6Gc6Z-p0GmDs3aBCOzHiw_XKK_ZdRmVe7VEMFXRLG3X9Lebb4vRJ9rcDa6k3ztx5k7yBF)
+     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
+
 
 
 #  TouchAd SDK For KB 설치 가이드
@@ -333,9 +353,9 @@ android {
 
     defaultConfig {
         applicationId "kr.co.touchad"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1009
+        versionCode 1002
         versionName "1.0"
         multiDexEnabled true
     }
@@ -371,8 +391,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
@@ -402,17 +422,17 @@ object TouchAdPlatform {
 /**
 * 터치애드 전면광고 화면 시작
 */
-fun  openKBAdvertise(context: Context, mbrId: String, data: String)
+fun  openKBAdvertise(context: Context, cid: String, data: String)
 
 /**
 * 터치애드 화면 시작
 */
-fun  openKBTouchAdMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?, callback: (() -> Unit)?)
+fun  openKBTouchAdMenu(context: Context, cid: String)
 
 /**
 * 참여적립 화면 시작
 */
-fun  openKBEarningMenu(context: Context, mbrId: String, adPushYn: String?, gender: String?, birthYear: String?)
+fun  openKBEarningMenu(context: Context, cid: String)
  
 }
 ~~~
@@ -423,13 +443,13 @@ fun  openKBEarningMenu(context: Context, mbrId: String, adPushYn: String?, gende
 
 *  카드결제완료 후 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
 *  광고회원가입된 유저일경우 전면광고 화면으로 이동합니다.
-*  mbrId = 고객관리번호(필수값)
+*  cid = 고객관리번호(필수값)
 *  data = 푸시데이터(필수값, FCM 항목 참고하시면 됩니다.)
 
 *  아래는 터치애드 전면광고 시작함수 호출 예시입니다.
 
 ~~~
-TouchAdPlatform.openKBAdvertise(context, mbrId, data);
+TouchAdPlatform.openKBAdvertise(context, cid, data);
 ~~~
 
 
@@ -437,20 +457,11 @@ TouchAdPlatform.openKBAdvertise(context, mbrId, data);
 ##  참여적립 화면 시작
 
 *  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의를 거치고 참여적립 화면을 시작할때 호출합니다.
-*  mbrId = 고객관리번호(필수값)
-*  아래 3개의 파라미터는 협의중인 단계로 Null 값을 넣어 호출해도 되는 내용입니다.
-   *  adPushYn = KB 광고푸시수신여부 (대문자 "Y" 또는 "N")
-   *  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
-   *  birthYear = 생년월일 YYMMDD 6자리
+*  cid = 고객관리번호(필수값)
 *  아래는 참여적립 화면 시작함수 호출 예시입니다.
 
 ~~~
-/*
-* 세번째 파라미터 : adPushYn
-* 네번째 파라미터 : gender
-* 다섯번째 파라미터 : birthYear
-*/
-TouchAdPlatform.openKBEarningMenu(context, mbrId, null, null, null)
+TouchAdPlatform.openKBEarningMenu(context, cid)
 ~~~
 
 
@@ -458,23 +469,11 @@ TouchAdPlatform.openKBEarningMenu(context, mbrId, null, null, null)
 ## 터치애드 화면 시작
 
 *  KB 앱 내에서 터치애드 메뉴를 선택하면 약관동의를 거치고 터치애드 화면을 시작할때 호출합니다.
-*  mbrId = 고객관리번호(필수값)
-*  아래 4개의 파라미터는 협의중인 단계로 Null 값을 넣어 호출해도 되는 내용입니다.
-   *  adPushYn = KB 광고푸시수신여부 (대문자 "Y" 또는 "N")
-   *  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
-   *  birthYear = 생년월일 YYMMDD 6자리
-   *  kbCallback = KB 설정화면 호출을 위한 콜백변수 
-   KB 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
+*  cid = 고객관리번호(필수값)
 *  아래는 터치애드 화면 시작함수 호출 예시입니다.
 
 ~~~
-/*
-* 세번째 파라미터 : adPushYn
-* 네번째 파라미터 : gender
-* 다섯번째 파라미터 : birthYear
-* 여섯번째 파라미터 : kbCallback = KB 설정화면 호출을 위한 콜백 변수
-*/
-TouchAdPlatform.openKBTouchAdMenu(context, mbrId, null, null, null, null)
+TouchAdPlatform.openKBTouchAdMenu(context, cid)
 ~~~
 
 ##  터치애드 푸시 수신 시
@@ -542,10 +541,10 @@ class FcmListenerService : FirebaseMessagingService() {
 
    override fun onMessageReceived(remoteMessage:RemoteMessage) {  
 
-      val mbrId : String = 멤버십 카드번호
+      val cid : String = 고객관리번호
       
-      if(mbrId.isNullOrEmpty()){
-          Toast.makeText(this, R.string.empty_mbr_id, Toast.LENGTH_SHORT).show()
+      if(cid.isNullOrEmpty()){
+          Toast.makeText(this, R.string.empty_cid, Toast.LENGTH_SHORT).show()
       }else{
           val pushData : String? = remoteMessage.data["touchad"]
           if(pushData.isNullOrEmpty()){
@@ -561,7 +560,7 @@ class FcmListenerService : FirebaseMessagingService() {
                   
                   if touchad != null
                   {
-                     TouchAdPlatform.openKBAdvertise(this, mbrId, it)
+                     TouchAdPlatform.openKBAdvertise(this, cid, it)
                   }
               }
               
@@ -574,7 +573,7 @@ class FcmListenerService : FirebaseMessagingService() {
                   
                   if pointree != null && platformId == "KBF"
                   {
-                    TouchAdPlatform.openKBEarningResult(this, mbrId, it)
+                    TouchAdPlatform.openKBEarningResult(this, cid, it)
                   }
               }
           }
