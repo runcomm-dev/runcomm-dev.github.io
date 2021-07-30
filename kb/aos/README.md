@@ -425,14 +425,14 @@ object TouchAdPlatform {
 fun  openKBAdvertise(context: Context, cid: String, data: String)
 
 /**
-* 터치애드 화면 시작
-*/
-fun  openKBTouchAdMenu(context: Context, cid: String)
-
-/**
-* 참여적립 화면 시작
+* 애드모아 화면 시작
 */
 fun  openKBEarningMenu(context: Context, cid: String)
+
+/**
+* 적립문의 화면 시작
+*/
+fun  openKBInquiryMenu(context: Context, cid: String)
  
 }
 ~~~
@@ -452,9 +452,7 @@ fun  openKBEarningMenu(context: Context, cid: String)
 TouchAdPlatform.openKBAdvertise(context, cid, data);
 ~~~
 
-
-
-##  참여적립 화면 시작
+##  애드모아 화면 시작
 
 *  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의를 거치고 참여적립 화면을 시작할때 호출합니다.
 *  cid = 고객관리번호(필수값)
@@ -464,16 +462,14 @@ TouchAdPlatform.openKBAdvertise(context, cid, data);
 TouchAdPlatform.openKBEarningMenu(context, cid)
 ~~~
 
+## 적립문의 화면 시작
 
-
-## 터치애드 화면 시작
-
-*  KB 앱 내에서 터치애드 메뉴를 선택하면 약관동의를 거치고 터치애드 화면을 시작할때 호출합니다.
+*  KB 앱 내에서 적립문의를 선택 시 호출합니다.
 *  cid = 고객관리번호(필수값)
 *  아래는 터치애드 화면 시작함수 호출 예시입니다.
 
 ~~~
-TouchAdPlatform.openKBTouchAdMenu(context, cid)
+TouchAdPlatform.openKBInquiryMenu(context, cid)
 ~~~
 
 ##  터치애드 푸시 수신 시
@@ -561,19 +557,6 @@ class FcmListenerService : FirebaseMessagingService() {
                   if touchad != null
                   {
                      TouchAdPlatform.openKBAdvertise(this, cid, it)
-                  }
-              }
-              
-              //2차 푸시
-              decodePushData?.let {
-                  //decodePushData json.pointree 값존재하고  json.platformId == "KBF" 일경우 함수 호출
-                  val json = JSONObject(decodePushData)
-                  val pointree = json.getString("pointree")
-                  val platformId = json.getString("platformId")
-                  
-                  if pointree != null && platformId == "KBF"
-                  {
-                    TouchAdPlatform.openKBEarningResult(this, cid, it)
                   }
               }
           }
