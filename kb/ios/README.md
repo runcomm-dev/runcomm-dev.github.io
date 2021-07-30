@@ -1,6 +1,6 @@
 #  TouchAd SDK  for KB 설치 가이드
 
-* 터치애드 광고플랫폼 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
+* 쓱쌓 광고플랫폼 제휴서비스를 위한 쓱쌓SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
 * 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.framework폴더를 선택합니다.
@@ -13,7 +13,7 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '9.0'
+platform :ios, '11.0'
 use_frameworks!
 
 target 'TouchadSDK' do
@@ -29,7 +29,7 @@ end
 ## 권한 설정
 
 1. **광고식별자(IDFA)**
-* 터치애드는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
+* 쓱쌓는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
 * IOS 14 이상부터 IDFA 를 사용하기 위해선 명시적으로 사용자 동의를 얻어야 합니다.
 * 앱프로젝트 info.plist 에 아래내용을 추가합니다.
 
@@ -55,7 +55,7 @@ func requestPermission() {
 }
 ```
 
-## 터치애드 플랫폼 클래스 함수
+## 쓱쌓 플랫폼 클래스 함수
 
 - 주요기능을 모듈화하여 Static 함수형태로 호출합니다.
 - 아래 간략한 설명입니다.
@@ -63,49 +63,33 @@ func requestPermission() {
 public class TASDKManager: NSObject {
 
 /**
-* 참여적립 화면 시작
-* @param mbrId: KB 회원관리번호 (필수)
-* @param adPushYn: KB 광고푸시수신여부 Y,N (옵션)
-* @param gender: KB 회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (옵션)
-* @param birthYear: KB 회원 생년월일 YYMMDD 6자리 (옵션)
+* 애드모아 화면 시작
+* @param cid: KB 회원관리번호 (필수)
 */
-func openKBEarningMenu(_ mbrId : String, adPushYn : String?, gender : String?, birthYear : String?)
+func openKBEarningMenu(_ cid : String)
 
 /**
-* 터치애드 화면 시작
-* @param mbrId: KB 회원관리번호 (필수)
-* @param adPushYn: KB 광고푸시수신여부 Y,N (옵션)
-* @param gender: KB 회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (옵션)
-* @param birthYear: KB 회원 생년월일 YYMMDD 6자리 (옵션)
-* @param callback: KB 설정화면 오픈함수 (옵션)
-*/
-func openKBTouchadMenu(_ mbrId : String, adPushYn : String?, gender : String?, birthYear : String?, callback: (() -> Void)?)
-
-/**
-* 터치애드 전면광고 오픈
-* @param mbrId: KB 회원관리번호 (필수)
+* 쓱쌓 전면광고 오픈
+* @param cid: KB 회원관리번호 (필수)
 * @param userInfo: apns custom data (필수)
 */
-func openKBAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
+func openKBAdvertise(_ cid : String, userInfo: [AnyHashable : Any])
 
 /**
-* 터치애드 참여적립 2차푸시 결과 화면
-* @param mbrId: KB 회원관리번호 (필수)
-* @param userInfo: apns custom data (필수)
+* 적립문의 화면 시작
+* @param cid: KB 회원관리번호 (필수)
 */
-func openKBEarningResult(_ mbrId : String, userInfo: [AnyHashable : Any])
-
-}
+func openKBInquiryMenu(_ cid : String)
 ```
 
 
-## 터치애드 전면광고 화면 시작 (백그라운드, IOS >= 10)
+## 쓱쌓 전면광고 화면 시작 (백그라운드, IOS >= 10)
 
-*  KB 신용카드 승인내역 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  KB 신용카드 승인내역 푸시 수신하고 이때 쓱쌓의 전면광고 화면을 띄울 경우 호출합니다.
 
 *  KB 앱이 미실행 상태이거나 백그라운드 상태일 경우 KB앱이 실행된후에 전면광고 화면이 나타납니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
@@ -115,13 +99,13 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 }
 ```
 
-## 터치애드 전면광고 화면 시작 (포그라운드, IOS >= 10)
+## 쓱쌓 전면광고 화면 시작 (포그라운드, IOS >= 10)
 
-*  KB 신용카드 승인내역 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  KB 신용카드 승인내역 푸시 수신하고 이때 쓱쌓의 전면광고 화면을 띄울 경우 호출합니다.
 
 *  KB 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     printd("willPresentNotification = \(notification.request.content.userInfo)")
@@ -132,11 +116,11 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 }
 ```
 
-## 터치애드 전면광고 화면 시작 (IOS < 10)
+## 쓱쌓 전면광고 화면 시작 (IOS < 10)
 
-*  KB 신용카드 승인내역 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  KB 신용카드 승인내역 푸시 수신하고 이때 쓱쌓의 전면광고 화면을 띄울 경우 호출합니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
 ```
 private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
     //[AnyHashable : Any]
@@ -146,82 +130,27 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 }
 ```
 
+## 애드모아 화면 시작
 
+*  KB 앱 내에서 애드모아 메뉴를 선택하면 약관동의 거치고 애드모아 화면을 시작할때 호출합니다.
 
-## 참여적립 화면 시작
-
-*  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
-
-* 아래는 참여적립 화면 시작함수 호출 예시입니다.
+* 아래는 애드모아 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openKBEarningMenu("회원관리번호",adPushYn:nil, gender: nil, birthYear: nil)
+TASDKManager.openKBEarningMenu("회원관리번호")
 ```
 
-## 터치애드 화면 시작
+## 적립문의 화면 시작
 
-*  KB 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+*  KB 앱 내에서 적립문의 메뉴를 선택하면 적립문의 화면을 시작할때 호출합니다.
 
-*  KB 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
-
-*  아래는 터치애드 화면 시작함수 호출 예시입니다.
+*  아래는 쓱쌓 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openKBTouchadMenu("회원관리번호",adPushYn:nil, gender: nil, birthYear: nil, callback:nil)
+TASDKManager.openKBInquiryMenu("회원관리번호")
 ```
-
-## 참여적립 2차 푸시 결과 화면 (백그라운드, IOS >= 10)
-
-*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 화면과 포인트 팝업을 띄울 경우 호출합니다. 
-
-*  KB 앱이 미실행 상태이거나 백그라운드 상태일 경우 KB앱이 실행된후에 화면이 나타납니다.
-
-*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
-```
-func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    
-    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'KBF' 값일때 호출합니다.
-    TASDKManager.openKBEarningResult("회원관리번호", userInfo: response.notification.request.content.userInfo)
-        
-    completionHandler()
-}
-```
-
-## 참여적립 2차 푸시 결과 화면 (포그라운드, IOS >= 10)
-
-*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 화면과 포인트 팝업을 띄울 경우 호출합니다. 
-
-*  KB 앱이 실행 상태일 경우 화면이 나타납니다.
-
-*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
-```
-func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    printd("willPresentNotification = \(notification.request.content.userInfo)")
-    
-    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'KBF' 값일때 호출합니다.
-    TASDKManager.openKBEarningResult("회원관리번호", userInfo: notification.request.content.userInfo)
-    
-    completionHandler([.alert, .badge, .sound])
-}
-```
-
-## 참여적립 2차 푸시 결과 화면 (IOS < 10)
-
-*  참여적립 메뉴에서 광고 이용후 2차푸시(적립결과)를 수신하고 이때 참여적립 화면과 포인트 팝업을 띄울 경우 호출합니다. 
-
-*  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
-```
-private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-    //[AnyHashable : Any]
-    
-    //userInfo에 dalcoin 데이터 존재하고 platformId 데이터 'KBF' 값일때 호출합니다.
-    TASDKManager.openKBEarningResult("회원관리번호", userInfo: userInfo)
-
-}
-```
-
 
 ## FCM 전송
 
-* 터치애드는 푸시 송신 시 KB 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
+* 쓱쌓는 푸시 송신 시 KB 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
 * Form파라미터(**필수**)
 
 | 파라미터 | 내용 |
@@ -246,7 +175,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
     "payload": {
       "aps": {
         "alert": {
-          "title": "터치애드",
+          "title": "쓱쌓",
           "subtitle": "광고시청하면 포인트리 적립!!!",
           "body": "출퇴근시간 지하철 통신비 절약되는 리브광고 많이 이용해주세요."
         },
