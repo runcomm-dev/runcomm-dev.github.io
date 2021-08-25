@@ -18,10 +18,10 @@ use_frameworks!
 
 target 'TouchadSDK' do
 
-  pod 'SnapKit', '~> 4.0.1'
+  pod 'SnapKit', '~> 4.0.0'
   pod 'Alamofire', '~> 4.8.2'
-  pod 'ObjectMapper', '~> 4.2.0'
-  pod 'JWTDecode', '~> 2.5.0'
+  pod 'ObjectMapper'
+  pod 'JWTDecode', '~> 2.4'
   
 end
 ```
@@ -71,15 +71,25 @@ func openKBEarningMenu(_ cid : String)
 /**
 * 쓱쌓 전면광고 오픈
 * @param cid: KB 회원관리번호 (필수)
-* @param userInfo: apns custom data (필수)
+* @param userInfoString: apns custom data 문자열(필수)
 */
-func openKBAdvertise(_ cid : String, userInfo: [AnyHashable : Any])
+func openKBAdvertise(_ cid : String, userInfoString: String)
 
 /**
 * 적립문의 화면 시작
 * @param cid: KB 회원관리번호 (필수)
 */
 func openKBInquiryMenu(_ cid : String)
+
+/**
+* 이용안내 화면 시작
+*/
+func openKBUseInfoMenu()
+
+/**
+* 공지사항 화면 시작
+*/
+func openKBNoticeMenu()
 ```
 
 
@@ -93,7 +103,7 @@ func openKBInquiryMenu(_ cid : String)
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-    TASDKManager.openKBAdvertise("회원관리번호", userInfo: response.notification.request.content.userInfo)
+    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
         
     completionHandler()
 }
@@ -110,7 +120,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     printd("willPresentNotification = \(notification.request.content.userInfo)")
     
-    TASDKManager.openKBAdvertise("회원관리번호", userInfo: notification.request.content.userInfo)
+    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: notification.request.content.userInfo["touchad"])
     
     completionHandler([.alert, .badge, .sound])
 }
@@ -125,9 +135,19 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
     //[AnyHashable : Any]
     
-    TASDKManager.openKBAdvertise("회원관리번호", userInfo: userInfo)
+    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: userInfo["touchad"])
 
 }
+```
+
+## 쓱쌓 전면광고 시작함수 파라미터 userInfoString 전달방식
+
+* 쓱쌓 전면광고 시작함수 호출 시 userInfoString을 아래 예시와 같은 형식으로 JSON String 전체를 전달하면됩니다.
+```
+let userInfoString: String = 
+"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",\"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr%2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
+
+TASDKManager.openKBAdvertise("회원관리번호", userInfoString: userInfoString)
 ```
 
 ## 애드모아 화면 시작
@@ -143,9 +163,27 @@ TASDKManager.openKBEarningMenu("회원관리번호")
 
 *  KB 앱 내에서 적립문의 메뉴를 선택하면 적립문의 화면을 시작할때 호출합니다.
 
-*  아래는 쓱쌓 화면 시작함수 호출 예시입니다.
+*  아래는 적립문의 화면 시작함수 호출 예시입니다.
 ```
 TASDKManager.openKBInquiryMenu("회원관리번호")
+```
+
+## 이용안내 화면 시작
+
+*  KB 앱 내에서 이용안내 메뉴를 선택하면 이용안내 화면을 시작할때 호출합니다.
+
+*  아래는 이용안내 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openKBUseInfoMenu()
+```
+
+## 공지사항 화면 시작
+
+*  KB 앱 내에서 공지사항 메뉴를 선택하면 공지사항 화면을 시작할때 호출합니다.
+
+*  아래는 공지사항 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openKBNoticeMenu()
 ```
 
 ## FCM 전송
@@ -165,7 +203,7 @@ TASDKManager.openKBInquiryMenu("회원관리번호")
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
     }
   },
   "apns": {
@@ -181,7 +219,8 @@ TASDKManager.openKBInquiryMenu("회원관리번호")
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": 
+      "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
