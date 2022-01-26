@@ -46,7 +46,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1002
+        versionCode 1009
         versionName "1.0"
         multiDexEnabled true
 
@@ -173,6 +173,9 @@ private fun checkRequiredPermission() {
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
+    <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
     <application
         android:icon="@mipmap/tc_ic_launcher"
         android:label="@string/app_name"
@@ -211,7 +214,7 @@ private fun checkRequiredPermission() {
 ### proguard-rules.pro 파일
 
 * jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 쓱쌓 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 stactrace 오류보고에 대한 난독화 예외도 추가합니다.
+* 추가로 retrofit2및 stacktrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
 -keep class kr.co.touchad.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
@@ -355,7 +358,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 1002
+        versionCode 1009
         versionName "1.0"
         multiDexEnabled true
     }
@@ -443,6 +446,11 @@ fun  openKBUseInfoMenu(context: Context)
 * 공지사항 화면 시작
 */
 fun  openKBNoticeMenu(context: Context)
+
+/**
+* 참여이력 화면 시작
+*/
+fun openKBApprlNoMenu(context: Context, cid: String)
  
 }
 ~~~
@@ -469,9 +477,9 @@ TouchAdPlatform.openKBAdvertise(context, cid, data);
 
 ##  애드모아 화면 시작
 
-*  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의를 거치고 참여적립 화면을 시작할때 호출합니다.
+*  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의를 거치고 애드모아 화면을 시작할때 호출합니다.
 *  cid = 고객관리번호(필수값)
-*  아래는 참여적립 화면 시작함수 호출 예시입니다.
+*  아래는 애드모아 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openKBEarningMenu(context, cid)
@@ -490,7 +498,7 @@ TouchAdPlatform.openKBInquiryMenu(context, cid)
 ## 이용안내 화면 시작
 
 *  KB 앱 내에서 이용안내를 선택 시 호출합니다.
-*  아래는 적립문의 화면 시작함수 호출 예시입니다.
+*  아래는 이용안내 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openKBUseInfoMenu(context)
@@ -499,10 +507,19 @@ TouchAdPlatform.openKBUseInfoMenu(context)
 ## 공지사항 화면 시작
 
 *  KB 앱 내에서 공지사항을 선택 시 호출합니다.
-*  아래는 적립문의 화면 시작함수 호출 예시입니다.
+*  아래는 공지사항 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openKBNoticeMenu(context)
+~~~
+
+## 참여이력 화면 시작
+
+*  KB 앱 내에서 참여이력을 선택 시 호출합니다.
+*  아래는 공지사항 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBApprlNoMenu(context, cid)
 ~~~
 
 ##  쓱쌓 푸시 수신 시
@@ -519,9 +536,10 @@ TouchAdPlatform.openKBNoticeMenu(context)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-"{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",
-\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",
-\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+ \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+ %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -533,9 +551,10 @@ TouchAdPlatform.openKBNoticeMenu(context)
     "priority": "high",
     "data": {
       "touchad": 
-         "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-            \"custom-type\":\"touchad\",
-            \"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+         "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+          \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+          %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     }
   },
   "apns": {
@@ -552,9 +571,10 @@ TouchAdPlatform.openKBNoticeMenu(context)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",
-         \"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",
-         \"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+         \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+         %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
