@@ -90,6 +90,12 @@ func openKBUseInfoMenu()
 * 공지사항 화면 시작
 */
 func openKBNoticeMenu()
+
+/**
+* 참여이력 화면 시작
+*/
+func openKBApprlNoMenu()
+
 ```
 
 
@@ -184,6 +190,15 @@ TASDKManager.openKBUseInfoMenu()
 *  아래는 공지사항 화면 시작함수 호출 예시입니다.
 ```
 TASDKManager.openKBNoticeMenu()
+```
+
+## 참여이력 화면 시작
+
+*  KB 앱 내에서 참여이력 메뉴를 선택하면 참여이력 화면을 시작할때 호출합니다.
+
+*  아래는 참여이력 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openKBApprlNoMenu("회원관리번호")
 ```
 
 ## FCM 전송
