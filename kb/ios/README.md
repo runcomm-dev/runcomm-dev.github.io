@@ -94,7 +94,7 @@ func openKBNoticeMenu()
 /**
 * 참여이력 화면 시작
 */
-func openKBApprlNoMenu()
+func openKBApprlNoMenu(_ cid : String)
 
 ```
 
