@@ -24,7 +24,7 @@
 * SKT 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For SKT 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 30, compileSdkVersion : 30 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
 
 
 
@@ -43,12 +43,12 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
 
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 30
-        versionCode 1013
+        targetSdkVersion 31
+        versionCode 1018
         versionName "1.0"
         multiDexEnabled true
 
@@ -125,6 +125,8 @@ dependencies {
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
     **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
+* Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
+* 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
@@ -194,7 +196,7 @@ private fun checkRequiredPermission() {
 
     <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    
+
     <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
 
@@ -208,8 +210,7 @@ private fun checkRequiredPermission() {
 
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    
-    <!--외부저장소 접근 권한 // 권한 레벨 : 위험-->
+
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
     <!--진동 사용 권한 // 권한 레벨 : 일반-->
@@ -217,6 +218,9 @@ private fun checkRequiredPermission() {
 
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+
+    <!--광고아이디 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
         android:icon="@mipmap/tc_ic_launcher"
@@ -236,33 +240,59 @@ private fun checkRequiredPermission() {
             android:exported="false"
             android:permission="android.permission.FOREGROUND_SERVICE"
             android:protectionLevel="signature">
+            <!--<intent-filter>
+                <action android:name="kr.co.touchad.ui.service" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>-->
         </service>
 
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
-            android:theme="@style/TouchAdTheme">
+            android:theme="@style/TouchAdTheme"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false">
         </activity>
 
         <!-- 전체 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
-            android:theme="@style/TouchAdTheme">
+            android:theme="@style/TouchAdTheme"
+            android:exported="false">
         </activity>
 
         <!-- 카드등록 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
             android:theme="@style/TouchAdTheme"
-            android:windowSoftInputMode="stateVisible">
+            android:windowSoftInputMode="stateVisible"
+            android:exported="false">
         </activity>
 
         <!-- 카드 스캔 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardScanActivity"
             android:theme="@style/TouchAdTheme"
             android:configChanges="orientation"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:exported="false">
         </activity>
 
-        <activity android:name="io.card.payment.DataEntryActivity"/>
-        
+        <activity android:name="io.card.payment.DataEntryActivity"
+            android:exported="false"/>
+
+        <!--&lt;!&ndash; 딥링크 게이트웨이 &ndash;&gt;
+        <activity android:name="kr.co.touchad.ui.activity.deeplink.SchemeActivity"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.TransparentTouchAd"
+            android:noHistory="true">
+            <intent-filter >
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main" />
+                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise" />
+                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise_point_list" />
+                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/card_register" />
+            </intent-filter>
+        </activity>-->
     </application>
 </manifest>
 ~~~
@@ -272,7 +302,7 @@ private fun checkRequiredPermission() {
 ### proguard-rules.pro 파일
 
 * jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
-* 추가로 retrofit2및 glide, stactrace 오류보고에 대한 난독화 예외도 추가합니다.
+* 추가로 retrofit2및 stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
 -keep class kr.co.touchad.sdk.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
@@ -364,13 +394,6 @@ private fun checkRequiredPermission() {
 
 ##---------------End: proguard configuration for card.io  ------------
 
-# glide
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep public class * extends com.bumptech.glide.module.AppGlideModule
--keep public enum com.bumptech.glide.load.resource.bitmap.ImageHeaderParser$** {
- **[] $VALUES;
- public *;
-}
 -keepclassmembers enum * {
    public static **[] values();
    public static ** valueOf(java.lang.String);
@@ -462,13 +485,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 17
-        targetSdkVersion 30
-        versionCode 1013
+        targetSdkVersion 31
+        versionCode 1018
         versionName "1.0"
         multiDexEnabled true
     }
@@ -512,7 +535,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
 
     implementation name: 'touchad-sdk-1.0.0', ext: 'aar'
 
@@ -522,7 +544,15 @@ dependencies {
 }
 ~~~
 
-
+## Android 12 버전 업데이트로 인한 AndroidManifest 설정 안내
+  1. **android:exported 속성 추가**
+     * 이 속성은 SDK에도 반영이 되어있습니다.
+     * 앱이 Android 12 이상을 타겟팅하고 인텐트 필터를 사용하는 액티비티나 서비스, broadcast receiver를 포함할 시 명시적으로 선언해야합니다.
+     * 명시적으로 선언을 하지 않을 경우 Android 12 이상을 실행하는 기기에 앱을 설치할 수 없습니다.
+     * 앱 구성요소에 LAUNCHER 카테고리가 포함된 경우 android:exported를 true로 설정합니다.
+     * 아래 링크 주소는 안드로이드 Developers 공식 관련 내용입니다.
+     * https://developer.android.com/about/versions/12/behavior-changes-12?hl=ko
+     * https://developer.android.com/guide/topics/manifest/activity-element?hl=ko#exported
 
 ## 터치애드 플랫폼 클래스 함수
 
@@ -648,7 +678,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -660,7 +690,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     }
   },
   "apns": {
@@ -677,7 +707,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
