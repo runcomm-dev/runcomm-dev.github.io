@@ -55,46 +55,49 @@ func requestPermission() {
 }
 ```
 
-## 쓱쌓 플랫폼 클래스 함수
+## 쓱쌓 플랫폼 public 클래스
 
-- 주요기능을 모듈화하여 Static 함수형태로 호출합니다.
+- 주요기능화면을 제어할 수 있게 UIViewController 확장클래스를 이용합니다.
 - 아래 간략한 설명입니다.
 ```
-public class TASDKManager: NSObject {
-
 /**
-* 애드모아 화면 시작
+* 애드모아 ViewController
+* 생성자 매개변수
 * @param cid: KB 회원관리번호 (필수)
 */
-func openKBEarningMenu(_ cid : String)
+@objc public class KBEarningMenuViewController: UINavigationController
 
 /**
-* 쓱쌓 전면광고 오픈
+* 쓱쌓 전면광고 ViewController
+* 생성자 매개변수
 * @param cid: KB 회원관리번호 (필수)
 * @param userInfoString: apns custom data 문자열(필수)
 */
-func openKBAdvertise(_ cid : String, userInfoString: String)
+@objc public class KBAdvertiseViewController: UINavigationController
 
 /**
-* 적립문의 화면 시작
+* 적립문의 ViewController
+* 생성자 매개변수
 * @param cid: KB 회원관리번호 (필수)
 */
-func openKBInquiryMenu(_ cid : String)
+@objc public class KBInquiryMenuViewController: UINavigationController
 
 /**
-* 이용안내 화면 시작
+* 이용안내 ViewController
 */
-func openKBUseInfoMenu()
+@objc public class KBUseInfoMenuViewController: UINavigationController
 
 /**
-* 공지사항 화면 시작
+* 공지사항 ViewController
 */
-func openKBNoticeMenu()
+@objc public class KBNoticeMenuViewController: UINavigationController
 
 /**
-* 참여이력 화면 시작
+* 참여이력 ViewController
+* 생성자 매개변수
+* @param cid: KB 회원관리번호 (필수)
 */
-func openKBApprlNoMenu(_ cid : String)
+@objc public class KBApprlNoMenuViewController: UINavigationController
 
 ```
 
@@ -105,13 +108,30 @@ func openKBApprlNoMenu(_ cid : String)
 
 *  KB 앱이 미실행 상태이거나 백그라운드 상태일 경우 KB앱이 실행된후에 전면광고 화면이 나타납니다.
 
-* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 ViewController 호출 예시입니다.
+
+* Swift
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
-    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
-        
+    if let vc = window?.rootViewController as? UINavigationController {
+        let navController = KBAdvertiseViewController(cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
+        vc.present(navController, animated:true, completion: nil)
+    }
+    
     completionHandler()
+}
+```
+
+* Objective-C
+```
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center 
+        didReceiveNotificationResponse:(UNNotificationResponse *)response 
+         withCompletionHandler:(void (^)(void))completionHandler
+{
+        KBAdvertiseViewController* vc = [[KBAdvertiseViewController alloc] initWithCid:@"회원관리번호" 
+        userInfoString:response.notification.request.content.userInfo["touchad"]];
+        [self.navigationController presentViewController:vc animated:YES completion:nil];
 }
 ```
 
@@ -121,14 +141,31 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 
 *  KB 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
 
-* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 ViewController 호출 예시입니다.
+
+* Swift
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     printd("willPresentNotification = \(notification.request.content.userInfo)")
     
-    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: notification.request.content.userInfo["touchad"])
+    if let vc = window?.rootViewController as? UINavigationController {
+        let navController = KBAdvertiseViewController(cid: "회원관리번호", userInfoString: notification.request.content.userInfo["touchad"])
+        vc.present(navController, animated:true, completion: nil)
+    }
     
     completionHandler([.alert, .badge, .sound])
+}
+```
+
+* Objective-C
+```
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center 
+       willPresentNotification:(UNNotification *)notification 
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+{
+        KBAdvertiseViewController* vc = [[KBAdvertiseViewController alloc] initWithCid:@"회원관리번호" 
+        userInfoString:response.notification.request.content.userInfo["touchad"]];
+        [self.navigationController presentViewController:vc animated:YES completion:nil];
 }
 ```
 
@@ -136,69 +173,140 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 
 *  KB 신용카드 승인내역 푸시 수신하고 이때 쓱쌓의 전면광고 화면을 띄울 경우 호출합니다.
 
-* 아래는 쓱쌓 전면광고 시작함수 호출 예시입니다.
+* 아래는 쓱쌓 전면광고 ViewController 호출 예시입니다.
+
+* Swift
 ```
 private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
     //[AnyHashable : Any]
     
-    TASDKManager.openKBAdvertise("회원관리번호", userInfoString: userInfo["touchad"])
+    if let vc = window?.rootViewController as? UINavigationController {
+        let navController = KBAdvertiseViewController(cid: "회원관리번호", userInfoString: userInfo["touchad"])
+        vc.present(navController, animated:true, completion: nil)
+    }
 
 }
 ```
 
-## 쓱쌓 전면광고 시작함수 파라미터 userInfoString 전달방식
+* Objective-C
+```
+- (void)application:(UIApplication *)application 
+didReceiveRemoteNotification:(NSDictionary *)userInfo 
+{
+        KBAdvertiseViewController* vc = [[KBAdvertiseViewController alloc] initWithCid:@"회원관리번호" userInfoString:userInfo["touchad"]];
+        [self.navigationController presentViewController:vc animated:YES completion:nil];
+}
+```
+
+## 쓱쌓 전면광고 ViewController 파라미터 userInfoString 전달방식
 
 * 쓱쌓 전면광고 시작함수 호출 시 userInfoString을 아래 예시와 같은 형식으로 JSON String 전체를 전달하면됩니다.
+
+* Swift
 ```
 let userInfoString: String = 
-"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",\"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr%2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
+"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",\"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr%2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 
-TASDKManager.openKBAdvertise("회원관리번호", userInfoString: userInfoString)
+let navController = KBAdvertiseViewController(cid: "회원관리번호", userInfoString: userInfoString)
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"];
+
+KBAdvertiseViewController* vc = [[KBAdvertiseViewController alloc] initWithCid:@"회원관리번호" userInfoString:useInfo];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## 애드모아 화면 시작
 
 *  KB 앱 내에서 애드모아 메뉴를 선택하면 약관동의 거치고 애드모아 화면을 시작할때 호출합니다.
 
-* 아래는 애드모아 화면 시작함수 호출 예시입니다.
+* 아래는 애드모아 ViewController 호출 예시입니다.
+
+* Swift
 ```
-TASDKManager.openKBEarningMenu("회원관리번호")
+let navController = KBEarningMenuViewController(cid: "회원관리번호")
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBEarningMenuViewController* vc = [[KBEarningMenuViewController alloc] initWithCid:@"회원관리번호"];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## 적립문의 화면 시작
 
 *  KB 앱 내에서 적립문의 메뉴를 선택하면 적립문의 화면을 시작할때 호출합니다.
 
-*  아래는 적립문의 화면 시작함수 호출 예시입니다.
+*  아래는 적립문의 ViewController 호출 예시입니다.
+
+* Swift
 ```
-TASDKManager.openKBInquiryMenu("회원관리번호")
+let navController = KBInquiryMenuViewController(cid: "회원관리번호")
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBInquiryMenuViewController* vc = [[KBInquiryMenuViewController alloc] initWithCid:@"회원관리번호"];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## 이용안내 화면 시작
 
 *  KB 앱 내에서 이용안내 메뉴를 선택하면 이용안내 화면을 시작할때 호출합니다.
 
-*  아래는 이용안내 화면 시작함수 호출 예시입니다.
+*  아래는 이용안내 ViewController 호출 예시입니다.
+
+* Swift
 ```
-TASDKManager.openKBUseInfoMenu()
+let navController = KBUseInfoMenuViewController()
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBUseInfoMenuViewController* vc = [[KBUseInfoMenuViewController alloc] init];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## 공지사항 화면 시작
 
 *  KB 앱 내에서 공지사항 메뉴를 선택하면 공지사항 화면을 시작할때 호출합니다.
 
-*  아래는 공지사항 화면 시작함수 호출 예시입니다.
+*  아래는 공지사항 ViewController 호출 예시입니다.
+
+* Swift
 ```
-TASDKManager.openKBNoticeMenu()
+let navController = KBNoticeMenuViewController()
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBNoticeMenuViewController* vc = [[KBNoticeMenuViewController alloc] init];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## 참여이력 화면 시작
 
 *  KB 앱 내에서 참여이력 메뉴를 선택하면 참여이력 화면을 시작할때 호출합니다.
 
-*  아래는 참여이력 화면 시작함수 호출 예시입니다.
+*  아래는 참여이력 ViewController 호출 예시입니다.
+
+* Swift
 ```
-TASDKManager.openKBApprlNoMenu("회원관리번호")
+let navController = KBApprlNoMenuViewController(cid: "회원관리번호")
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBApprlNoMenuViewController* vc = [[KBApprlNoMenuViewController alloc] initWithCid:@"회원관리번호"];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
 ## FCM 전송
@@ -218,7 +326,7 @@ TASDKManager.openKBApprlNoMenu("회원관리번호")
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+      "touchad": "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
     }
   },
   "apns": {
@@ -235,7 +343,7 @@ TASDKManager.openKBApprlNoMenu("회원관리번호")
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-      "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+      "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
