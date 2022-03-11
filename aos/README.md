@@ -48,8 +48,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 31
-        versionCode 1018
-        versionName "1.0"
+        versionCode 1020
+        versionName "1.0.2"
         multiDexEnabled true
 
     }
@@ -125,6 +125,7 @@ dependencies {
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
     **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
+* 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
@@ -221,6 +222,9 @@ private fun checkRequiredPermission() {
 
     <!--광고아이디 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+    
+    <!--저장소 사용 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:icon="@mipmap/tc_ic_launcher"
@@ -277,22 +281,6 @@ private fun checkRequiredPermission() {
 
         <activity android:name="io.card.payment.DataEntryActivity"
             android:exported="false"/>
-
-        <!--&lt;!&ndash; 딥링크 게이트웨이 &ndash;&gt;
-        <activity android:name="kr.co.touchad.ui.activity.deeplink.SchemeActivity"
-            android:launchMode="singleTask"
-            android:theme="@style/Theme.TransparentTouchAd"
-            android:noHistory="true">
-            <intent-filter >
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main" />
-                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise" />
-                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/advertise_point_list" />
-                <data android:scheme="touchad" android:host="touchad.co.kr" android:pathPrefix="/main/card_register" />
-            </intent-filter>
-        </activity>-->
     </application>
 </manifest>
 ~~~
@@ -432,7 +420,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.0.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -476,7 +464,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.0’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.2’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -491,7 +479,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 31
-        versionCode 1018
+        versionCode 1020
         versionName "1.0"
         multiDexEnabled true
     }
@@ -535,8 +523,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.0.0', ext: 'aar'
+    implementation name: 'touchad-sdk-1.0.2', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -678,7 +667,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -690,7 +679,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     }
   },
   "apns": {
@@ -707,7 +696,7 @@ TouchAdPlatform.openMPEarningResult(context, mbrId, data)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
