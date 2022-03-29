@@ -13,15 +13,15 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '9.0'
+platform :ios, '10.0'
 use_frameworks!
 
 target 'TouchadSDK' do
 
-  pod 'SnapKit', '~> 4.0.0'
+  pod 'SnapKit', '~> 4.0.1'
   pod 'Alamofire', '~> 4.8.2'
-  pod 'ObjectMapper'
-  pod 'JWTDecode', '~> 2.4'
+  pod 'ObjectMapper', '~> 4.2.0'
+  pod 'JWTDecode', '~> 2.5.0'
   
 end
 ```
@@ -117,6 +117,15 @@ func openMPAdvertise(_ mbrId : String, userInfo: [AnyHashable : Any])
 * @param userInfo: apns custom data
 */
 func openMPEarningResult(_ mbrId : String, userInfo: [AnyHashable : Any])
+
+/**
+* 오늘의 적립 배너 화면 시작
+* @param mbrId: MP 멤버십카드번호 (필수)
+* @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
+*/
+func openMPBanner(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
 }
 ```
@@ -246,6 +255,16 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 }
 ```
 
+## 오늘의 적립 배너 화면 시작
+
+*  MP 앱 내에서 오늘의 적립 배너를 터치시 약관동의 거치고 오늘의 적립 배너 화면을 시작할때 호출합니다.
+
+* 아래는 오늘의 적립 배너 화면 시작함수 호출 예시입니다.
+```
+TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
+```
+
+
 ## 터치애드 교통카드 등록
 
 * 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
@@ -271,7 +290,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     }
   },
   "apns": {
@@ -287,7 +306,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
