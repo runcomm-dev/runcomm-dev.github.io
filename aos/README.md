@@ -636,12 +636,12 @@ TouchAdPlatform.openMPTouchAdMenu(context, mbrId, adPushYn, gender, birthYear, m
 
 
 
-## 참여적립 2차 푸시 결과 화면
+## 참여적립 또는 오늘의적립 2차 푸시 결과 화면
 
-*  참여적립 메뉴에서 광고를 이용한 뒤 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다.
+*  참여적립 메뉴, 오늘의 적립에서 광고를 이용한 뒤 2차푸시(적립결과)를 수신하고 이때 참여적립 메인화면과 알림창을 띄울 경우 호출합니다.
 *  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 화면이 나타납니다.
 *  mbrId = 멤버십카드번호
-*  data = 2차푸시푸시데이터(예시 : "{\"dalcoin\": \"600\", \"platformId\" : \"SKTE\"}")
+*  data = 2차푸시푸시데이터(예시 : "{\"dalcoin\": \"600\", \"platformId\" : \"SKTE\" 또는 \"SKTG\"}")
 
 *  아래는 참여적립 2차 푸시 결과 화면 함수 호출 예시입니다.
 
@@ -691,7 +691,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -703,7 +703,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     }
   },
   "apns": {
@@ -720,7 +720,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
@@ -767,12 +767,12 @@ class FcmListenerService : FirebaseMessagingService() {
               
               //2차 푸시
               decodePushData?.let {
-                  //decodePushData json.dalcoin 값존재하고  json.platformId == "SKTE" 일경우 함수 호출
+                  //decodePushData json.dalcoin 값존재하고  json.platformId == "SKTE" 또는 "SKTG" 일경우 함수 호출
                   val json = JSONObject(decodePushData)
                   val dalcoin = json.getString("dalcoin")
                   val platformId = json.getString("platformId")
                   
-                  if dalcoin != null && platformId == "SKTE"
+                  if dalcoin != null && (platformId == "SKTE" || platformId == "SKTG")
                   {
                     TouchAdPlatform.openMPEarningResult(this, mbrId, it)
                   }
