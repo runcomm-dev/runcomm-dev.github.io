@@ -1,4 +1,3 @@
-
 # TouchAd 소개
 * 매체사 제휴서비스인 런컴광고전송플랫폼 서비스(이하, 터치애드) 안드로이드 앱용 SDK 설치에 관한 내용입니다.
 * 터치애드 서비스는 광고 포인트 적립 플랫폼입니다.
@@ -619,11 +618,11 @@ class FcmListenerService : FirebaseMessagingService() {
              startNotificationFinishApp()
 
              //인트로 후 NH멤버스 메인 화면 위에 NH띠링 전면광고 SDK 함수 호출
-             TouchAdPlatform.openKBAdvertise(this, "고객관리번호", pushData)
+             TouchAdPlatform.openNHAdvertise(this, "고객관리번호", pushData)
           } else { 
              //포그라운드 상태
              //전면광고 SDK 함수 호출
-             TouchAdPlatform.openKBAdvertise(this, "고객관리번호", pushData)
+             TouchAdPlatform.openNHAdvertise(this, "고객관리번호", pushData)
           }
       }  
    }  
