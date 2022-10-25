@@ -122,52 +122,6 @@ dependencies {
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
-* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
-~~~
-private fun checkRequiredPermission() {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return
-            }
-            permissionHelper = PermissionHelper(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), context)
-            if (permissionHelper!!.checkPermissionInApp()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val canDrawble = Settings.canDrawOverlays(context)
-                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                    }
-                }
-                return
-            }
-            permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
-    
-                override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
-                    mPermissions = permissions as Array<String?>
-                    mGrantResults = grantResults
-                    if (grantResults!!.isNotEmpty()) {
-                        for (i in grantResults.indices) {
-                            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                                Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
-                                break
-                            }
-                        }
-                    }
-    
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val canDrawble = Settings.canDrawOverlays(context)
-                        if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                            startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                        }
-                    }
-                }
-            })
-}
-~~~
-
-
-
-
 * 참조용으로 SDK 내에 설정된 내용입니다.
 ~~~
 <?xml version="1.0" encoding="utf-8"?>
@@ -188,21 +142,9 @@ private fun checkRequiredPermission() {
 
     <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-	
-	<!--Task 정보를 구하는 권한, 21버전 미만 통화상태 확인하기 위해 사용 // 권한레벨 : signatureOrSystem-->
-    <uses-permission android:name="android.permission.GET_TASKS"/>
 
     <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-
-    <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-
-    <!--진동 사용 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name = "android.permission.VIBRATE"/>
-
-    <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
@@ -427,7 +369,7 @@ dependencies {
 ## NH터치애드 플랫폼 클래스 함수
 
    - 기능을 모듈화하여 Static 함수형태로 호출합니다.
-   -  아래 간략한 설명입니다.
+   - 아래 간략한 설명입니다.
 
 ~~~
 object TouchAdPlatform {  
@@ -435,32 +377,12 @@ object TouchAdPlatform {
 /**
 * NH띠링 전면광고 화면 시작
 */
-fun  openNHAdvertise(context: Context, cid: String, data: String)
+fun  openNHAdvertise(context: Context, isProd: Boolean, cid: String, data: String)
 
 /**
 * NH터치애드 화면 시작
 */
-fun  openNHEarningMenu(context: Context, cid: String)
-
-/**
-* 적립문의 화면 시작
-*/
-fun  openNHInquiryMenu(context: Context, cid: String)
-
-/**
-* 이용안내 화면 시작
-*/
-fun  openNHUseInfoMenu(context: Context)
-
-/**
-* 공지사항 화면 시작
-*/
-fun  openNHNoticeMenu(context: Context)
-
-/**
-* 참여이력 화면 시작
-*/
-fun openNHApprlNoMenu(context: Context, cid: String)
+fun  openNHEarningMenu(context: Context, isProd: Boolean, cid: String)
  
 }
 ~~~
@@ -469,6 +391,7 @@ fun openNHApprlNoMenu(context: Context, cid: String)
 
 *  NH멤버스내 포인트 사용/적립 후 후 푸시 수신 후 터치시 NH띠링의 전면광고 화면을 띄울 경우 호출합니다.
 *  광고회원가입된 유저일경우 전면광고 화면으로 이동합니다.
+*  isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 *  cid = 고객관리번호(필수값)
 *  data = 푸시데이터(필수값, FCM 항목 참고하시면 됩니다.)
 * NH띠링 전면광고 시작함수 호출 시 data에 아래 예시와 같이 JSON String 전체를 전달하면 됩니다.
@@ -476,60 +399,28 @@ fun openNHApprlNoMenu(context: Context, cid: String)
 *  아래는 NH띠링 전면광고 시작함수 호출 예시입니다.
 
 ~~~
+val isProd: Boolean = true(상용 도메인) 또는 false(개발 도메인)
+
 val data: String = 
-"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
 \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 
-TouchAdPlatform.openNHAdvertise(context, cid, data);
+TouchAdPlatform.openNHAdvertise(context, isProd, cid, data);
 ~~~
 
 ##  NH터치애드 화면 시작
 
 *  NH멤버스 앱 내에서 NH터치애드 메뉴를 선택하면 약관동의를 거치고 NH터치애드 화면을 시작할때 호출합니다.
+*  isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 *  cid = 고객관리번호(필수값)
 *  아래는 NH터치애드 화면 시작함수 호출 예시입니다.
 
 ~~~
-TouchAdPlatform.openNHEarningMenu(context, cid)
-~~~
+val isProd: Boolean = true(상용 도메인) 또는 false(개발 도메인)
 
-## 적립문의 화면 시작
-
-*  NH멤버스 앱 내에서 적립문의를 선택 시 호출합니다.
-*  cid = 고객관리번호(필수값)
-*  아래는 적립문의 화면 시작함수 호출 예시입니다.
-
-~~~
-TouchAdPlatform.openNHInquiryMenu(context, cid)
-~~~
-
-## 이용안내 화면 시작
-
-*  NH멤버스 앱 내에서 이용안내를 선택 시 호출합니다.
-*  아래는 이용안내 화면 시작함수 호출 예시입니다.
-
-~~~
-TouchAdPlatform.openNHUseInfoMenu(context)
-~~~
-
-## 공지사항 화면 시작
-
-*  NH멤버스 앱 내에서 공지사항을 선택 시 호출합니다.
-*  아래는 공지사항 화면 시작함수 호출 예시입니다.
-
-~~~
-TouchAdPlatform.openNHNoticeMenu(context)
-~~~
-
-## 참여이력 화면 시작
-
-*  NH멤버스 앱 내에서 참여이력을 선택 시 호출합니다.
-*  아래는 공지사항 화면 시작함수 호출 예시입니다.
-
-~~~
-TouchAdPlatform.openNHApprlNoMenu(context, cid)
+TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
 ~~~
 
 ##  NH띠링 푸시 수신 시
@@ -546,9 +437,9 @@ TouchAdPlatform.openNHApprlNoMenu(context, cid)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
  \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 ~~~
 
@@ -556,14 +447,16 @@ TouchAdPlatform.openNHApprlNoMenu(context, cid)
 
 * FCM 전송 포맷 예시
 ~~~
+개발 도메인 : t.ta.runcomm.co.kr
+상용 도메인 : 1.ta.runcomm.co.kr
 {
   "android": {
     "priority": "high",
     "data": {
       "touchad": 
-         "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+         "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
           \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
     }
   },
@@ -581,13 +474,13 @@ TouchAdPlatform.openNHApprlNoMenu(context, cid)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
+		"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
          \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://1.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
@@ -610,6 +503,10 @@ class FcmListenerService : FirebaseMessagingService() {
    override fun onMessageReceived(remoteMessage:RemoteMessage) {  
 
       val pushData : String? = remoteMessage.data["touchad"]
+
+      //true = 상용 도메인, false = 개발 도메인
+      val isProd : Boolean = true
+
       if(pushData.isNullOrEmpty()){
           Toast.makeText(this, R.string.null_data, Toast.LENGTH_SHORT).show()
       } else {
@@ -618,11 +515,11 @@ class FcmListenerService : FirebaseMessagingService() {
              startNotificationFinishApp()
 
              //인트로 후 NH멤버스 메인 화면 위에 NH띠링 전면광고 SDK 함수 호출
-             TouchAdPlatform.openNHAdvertise(this, "고객관리번호", pushData)
+             TouchAdPlatform.openNHAdvertise(this, isProd, "고객관리번호", pushData)
           } else { 
              //포그라운드 상태
              //전면광고 SDK 함수 호출
-             TouchAdPlatform.openNHAdvertise(this, "고객관리번호", pushData)
+             TouchAdPlatform.openNHAdvertise(this, isProd, "고객관리번호", pushData)
           }
       }  
    }  
