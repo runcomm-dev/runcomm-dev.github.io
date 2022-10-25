@@ -63,6 +63,7 @@ func requestPermission() {
 /**
 * NH터치애드 ViewController
 * 생성자 매개변수
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 * @param cid: NH멤버스 회원관리번호 (필수)
 */
 @objc public class NHEarningMenuViewController: UINavigationController
@@ -70,34 +71,11 @@ func requestPermission() {
 /**
 * NH띠링 전면광고 ViewController
 * 생성자 매개변수
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 * @param cid: NH멤버스 회원관리번호 (필수)
 * @param userInfoString: apns custom data 문자열(필수)
 */
 @objc public class NHAdvertiseViewController: UINavigationController
-
-/**
-* 적립문의 ViewController
-* 생성자 매개변수
-* @param cid: NH멤버스 회원관리번호 (필수)
-*/
-@objc public class NHInquiryMenuViewController: UINavigationController
-
-/**
-* 이용안내 ViewController
-*/
-@objc public class NHUseInfoMenuViewController: UINavigationController
-
-/**
-* 공지사항 ViewController
-*/
-@objc public class NHNoticeMenuViewController: UINavigationController
-
-/**
-* 참여이력 ViewController
-* 생성자 매개변수
-* @param cid: NH멤버스 회원관리번호 (필수)
-*/
-@objc public class NHApprlNoMenuViewController: UINavigationController
 
 ```
 
@@ -113,9 +91,11 @@ func requestPermission() {
 * Swift
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
+    
+    let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
+    
     if let vc = window?.rootViewController as? UINavigationController {
-        let navController = NHAdvertiseViewController(cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
+        let navController = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
         vc.present(navController, animated:true, completion: nil)
     }
     
@@ -129,7 +109,10 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         didReceiveNotificationResponse:(UNNotificationResponse *)response 
          withCompletionHandler:(void (^)(void))completionHandler
 {
-        NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithCid:@"회원관리번호" 
+        BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
+
+        NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" 
+        
         userInfoString:response.notification.request.content.userInfo["touchad"]];
         [self.navigationController presentViewController:vc animated:YES completion:nil];
 }
@@ -168,18 +151,22 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 
 * Swift
 ```
+let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
+    
 let userInfoString: String = 
-"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
 
-let navController = NHAdvertiseViewController(cid: "회원관리번호", userInfoString: userInfoString)
+let navController = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: userInfoString)
 self.present(navController, animated:true, completion: nil)
 ```
 
 * Objective-C
 ```
-NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"];
+BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
 
-NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithCid:@"회원관리번호" userInfoString:useInfo];
+NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"];
+
+NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" userInfoString:useInfo];
 [self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
@@ -191,85 +178,17 @@ NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithCid:@
 
 * Swift
 ```
-let navController = NHEarningMenuViewController(cid: "회원관리번호")
+let isProd : Bool = true(상용도메인) 또는 false(개발도메인)
+
+let navController = NHEarningMenuViewController(isProd: isProd, cid: "회원관리번호")
 self.present(navController, animated:true, completion: nil)
 ```
 
 * Objective-C
 ```
-NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithCid:@"회원관리번호"];
-[self.navigationController presentViewController:vc animated:YES completion:nil];
-```
+BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
 
-## 적립문의 화면 시작
-
-*  NH멤버스 앱 내에서 적립문의 메뉴를 선택하면 적립문의 화면을 시작할때 호출합니다.
-
-*  아래는 적립문의 ViewController 호출 예시입니다.
-
-* Swift
-```
-let navController = NHInquiryMenuViewController(cid: "회원관리번호")
-self.present(navController, animated:true, completion: nil)
-```
-
-* Objective-C
-```
-NHInquiryMenuViewController* vc = [[NHInquiryMenuViewController alloc] initWithCid:@"회원관리번호"];
-[self.navigationController presentViewController:vc animated:YES completion:nil];
-```
-
-## 이용안내 화면 시작
-
-*  NH멤버스 앱 내에서 이용안내 메뉴를 선택하면 이용안내 화면을 시작할때 호출합니다.
-
-*  아래는 이용안내 ViewController 호출 예시입니다.
-
-* Swift
-```
-let navController = NHUseInfoMenuViewController()
-self.present(navController, animated:true, completion: nil)
-```
-
-* Objective-C
-```
-NHUseInfoMenuViewController* vc = [[NHUseInfoMenuViewController alloc] init];
-[self.navigationController presentViewController:vc animated:YES completion:nil];
-```
-
-## 공지사항 화면 시작
-
-*  NH멤버스 앱 내에서 공지사항 메뉴를 선택하면 공지사항 화면을 시작할때 호출합니다.
-
-*  아래는 공지사항 ViewController 호출 예시입니다.
-
-* Swift
-```
-let navController = NHNoticeMenuViewController()
-self.present(navController, animated:true, completion: nil)
-```
-
-* Objective-C
-```
-NHNoticeMenuViewController* vc = [[NHNoticeMenuViewController alloc] init];
-[self.navigationController presentViewController:vc animated:YES completion:nil];
-```
-
-## 참여이력 화면 시작
-
-*  NH멤버스 앱 내에서 참여이력 메뉴를 선택하면 참여이력 화면을 시작할때 호출합니다.
-
-*  아래는 참여이력 ViewController 호출 예시입니다.
-
-* Swift
-```
-let navController = NHApprlNoMenuViewController(cid: "회원관리번호")
-self.present(navController, animated:true, completion: nil)
-```
-
-* Objective-C
-```
-NHApprlNoMenuViewController* vc = [[NHApprlNoMenuViewController alloc] initWithCid:@"회원관리번호"];
+NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithIsProd: isProd cid:@"회원관리번호"];
 [self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
@@ -286,11 +205,13 @@ NHApprlNoMenuViewController* vc = [[NHApprlNoMenuViewController alloc] initWithC
 
 * FCM 전송 포맷 예시
 ```
+개발 도메인 : t.ta.runcomm.co.kr
+상용 도메인 : 1.ta.runcomm.co.kr
 {
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+      "touchad": "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
     }
   },
   "apns": {
@@ -307,10 +228,10 @@ NHApprlNoMenuViewController* vc = [[NHApprlNoMenuViewController alloc] initWithC
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-      "{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+      "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png" 
     }
   },
   "tokens": [
@@ -331,5 +252,3 @@ NHApprlNoMenuViewController* vc = [[NHApprlNoMenuViewController alloc] initWithC
 * 프로젝트명 : ios_touchAd
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
-
-
