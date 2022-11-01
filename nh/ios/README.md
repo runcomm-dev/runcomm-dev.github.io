@@ -74,8 +74,9 @@ func requestPermission() {
 * @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 * @param cid: NH멤버스 회원관리번호 (필수)
 * @param userInfoString: apns custom data 문자열(필수)
+* CommonWebViewController : UIViewController를 상속받는 확장 클래스
 */
-@objc public class NHAdvertiseViewController: UINavigationController
+@objc public class NHAdvertiseViewController: CommonWebViewController
 
 ```
 
@@ -86,6 +87,8 @@ func requestPermission() {
 
 * NH멤버스 앱이 미실행 상태이거나 백그라운드 상태일 경우 NH멤버스 앱이 실행된후에 전면광고 화면이 나타납니다.
 
+* 전면광고 화면 시작 시 현재 활성화 중인 ViewController로 pushViewController를 호출해야 전면광고가 나옵니다.
+
 * 아래는 NH띠링 전면광고 ViewController 호출 예시입니다.
 
 * Swift
@@ -93,10 +96,10 @@ func requestPermission() {
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     
     let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
-    
-    if let vc = window?.rootViewController as? UINavigationController {
-        let navController = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
-        vc.present(navController, animated:true, completion: nil)
+
+    if let vvc = self.window?.visibleViewController as? UIViewController {
+        let controller = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
+        vvc.navigationController?.pushViewController(controller, animated: true)
     }
     
     completionHandler()
@@ -112,9 +115,9 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
         BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
 
         NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" 
-        
         userInfoString:response.notification.request.content.userInfo["touchad"]];
-        [self.navigationController presentViewController:vc animated:YES completion:nil];
+        
+        [self.navigationController pushViewController:vc animated:YES];
 }
 ```
 
@@ -154,20 +157,20 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
     
 let userInfoString: String = 
-"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
 
-let navController = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: userInfoString)
-self.present(navController, animated:true, completion: nil)
+let controller = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: userInfoString)
+self.navigationController?.pushViewController(controller, animated: true)
 ```
 
 * Objective-C
 ```
 BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
 
-NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"];
+NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"];
 
 NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" userInfoString:useInfo];
-[self.navigationController presentViewController:vc animated:YES completion:nil];
+[self.navigationController pushViewController:vc animated:YES];
 ```
 
 ## NH터치애드 화면 시작
@@ -211,7 +214,7 @@ NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithI
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+      "touchad": "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
     }
   },
   "apns": {
@@ -228,10 +231,10 @@ NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithI
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-      "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
+      "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png" 
+      "image": "https://1.ta.runcomm.co.kr/html/img/profile00.png" 
     }
   },
   "tokens": [
