@@ -74,20 +74,21 @@ func requestPermission() {
 * @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 * @param cid: NH멤버스 회원관리번호 (필수)
 * @param userInfoString: apns custom data 문자열(필수)
-* CommonWebViewController : UIViewController를 상속받는 확장 클래스
 */
-@objc public class NHAdvertiseViewController: CommonWebViewController
+@objc public class NHAdvertiseViewController: UINavigationController
 
 ```
 
 
 ## NH띠링 전면광고 화면 시작 (백그라운드, IOS >= 10)
 
-* NH멤버스내 포인트 사용/적립 후 푸시 수신하고 터치시 NH띠링의 전면광고 화면을 띄울 경우 호출합니다.
+* NH멤버스내 포인트 사용/적립 후 푸시 수신하고 터치 시 NH띠링의 전면광고 화면을 띄울 경우 호출합니다.
+
+* 전면광고 화면이 올라온 상태에서 푸시 수신하고 터치 시 addUserInfoWithString함수에 userInfoString을 넣어 호출하면 됩니다.
+
+* NH터치애드 화면이 올라온 상태에서 푸시 수신하고 터치 시 NH터치애드 화면을 종료한 뒤 전면광고 화면을 띄우면 됩니다.
 
 * NH멤버스 앱이 미실행 상태이거나 백그라운드 상태일 경우 NH멤버스 앱이 실행된후에 전면광고 화면이 나타납니다.
-
-* 전면광고 화면 시작 시 현재 활성화 중인 ViewController로 pushViewController를 호출해야 전면광고가 나옵니다.
 
 * 아래는 NH띠링 전면광고 ViewController 호출 예시입니다.
 
@@ -95,11 +96,30 @@ func requestPermission() {
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     
-    let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
+    let isProd : Bool = true(상용 도메인) 또는 false(개발 도메인)
 
-    if let vvc = self.window?.visibleViewController as? UIViewController {
-        let controller = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: response.notification.request.content.userInfo["touchad"])
-        vvc.navigationController?.pushViewController(controller, animated: true)
+    let data : String = response.notification.request.content.userInfo["touchad"])
+
+    //NH멤버스 화면일 경우
+    if let nhmvc = self.window?.visibleViewController as? NH멤버스ViewController
+    {
+        let controller = NHAdvertiseViewController(isProd: isProd, cid: "회원관리번호", userInfoString: data)
+        nhmvc.present(controller, animated:true, completion: nil)
+    }
+    //NH띠링 전면광고 화면일 경우
+    else if let navc = self.window?.visibleViewController?.navigationController as? NHAdvertiseViewController 
+    {
+        navc.addUserInfoWithString(userInfoString: data)
+    }
+    //NH터치애드 화면일 경우
+    else if let nevc = self.window?.visibleViewController?.navigationController as? NHEarningMenuViewController
+    {
+        nevc.dismiss(animated: false) {
+            if let nhmvc = self.window?.visibleViewController as? NH멤버스ViewController {
+                let controller = NHAdvertiseViewController(isProd: self.isProd, cid: "회원관리번호", userInfoString: data)
+                nhmvc.present(controller, animated:true, completion: nil)
+            }
+        }
     }
     
     completionHandler()
@@ -108,16 +128,48 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 
 * Objective-C
 ```
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center 
-        didReceiveNotificationResponse:(UNNotificationResponse *)response 
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+        didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)(void))completionHandler
 {
-        BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
+    BOOL isProd = YES(상용 도메인) 또는 NO(개발 도메인);
+    NSString *data = response.notification.request.content.userInfo[@"touchad"];
+    ViewController* mvc = [AppDelegate visibleViewController];
+    NHAdvertiseViewController* navc = [AppDelegate visibleViewController].navigationController;
+    NHEarningMenuViewController* nevc = [AppDelegate visibleViewController].navigationController;
+    
+    //NH멤버스 화면일 경우
+    if (mvc != nil)
+    {
+        NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호"
+        userInfoString:data];
+        [mvc presentViewController:vc animated:YES completion:nil];
+    }
+    //전면광고 화면일 경우
+    else if (navc != nil)
+    {
+        [navc addUserInfoWithStringWithUserInfoString: data];
+    }
+    //NH터치애드 화면일 경우
+    else if (nevc != nil)
+    {
+        [nevc dismissViewControllerAnimated: NO completion:^{
+            NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호"
+            userInfoString:data];
+            [mvc presentViewController:vc animated:YES completion:nil];
+        }];
+    }
+}
 
-        NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" 
-        userInfoString:response.notification.request.content.userInfo["touchad"]];
-        
-        [self.navigationController pushViewController:vc animated:YES];
++ (UIViewController*) visibleViewController
+{
+    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+
+    while (topController.presentedViewController) {
+        topController = topController.presentedViewController;
+    }
+
+    return topController;
 }
 ```
 
@@ -154,7 +206,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 
 * Swift
 ```
-let isProd : Bool = true(상용도메인) 또는 false(개발 도메인)
+let isProd : Bool = true(상용 도메인) 또는 false(개발 도메인)
     
 let userInfoString: String = 
 "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"
@@ -165,12 +217,12 @@ self.navigationController?.pushViewController(controller, animated: true)
 
 * Objective-C
 ```
-BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
+BOOL isProd = YES(상용 도메인) 또는 NO(개발 도메인)
 
 NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",\"apprlNo\":\"1\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2F1.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fnh%3FapprlNo%3D12345678%22%7D\",\"platformId\":\"NHJ\"}"];
 
 NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsProd: isProd cid:@"회원관리번호" userInfoString:useInfo];
-[self.navigationController pushViewController:vc animated:YES];
+[self.navigationController pushViewController:vc animated:YES completion:nil];
 ```
 
 ## NH터치애드 화면 시작
@@ -181,7 +233,7 @@ NHAdvertiseViewController* vc = [[NHAdvertiseViewController alloc] initWithIsPro
 
 * Swift
 ```
-let isProd : Bool = true(상용도메인) 또는 false(개발도메인)
+let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
 
 let navController = NHEarningMenuViewController(isProd: isProd, cid: "회원관리번호")
 self.present(navController, animated:true, completion: nil)
@@ -189,7 +241,7 @@ self.present(navController, animated:true, completion: nil)
 
 * Objective-C
 ```
-BOOL isProd = true(상용도메인) 또는 false(개발 도메인)
+BOOL isProd = YES(상용 도메인) 또는 NO(개발 도메인)
 
 NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithIsProd: isProd cid:@"회원관리번호"];
 [self.navigationController presentViewController:vc animated:YES completion:nil];
