@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1012
-        versionName "1.0.3"
+        versionCode 1013
+        versionName "1.0.4"
         multiDexEnabled true
 
     }
@@ -335,7 +335,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.3.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.0.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -379,7 +379,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.3’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.4’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -394,7 +394,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1012
+        versionCode 1013
         versionName "1.0"
         multiDexEnabled true
     }
@@ -440,7 +440,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.0.3', ext: 'aar'
+    implementation name: 'touchad-sdk-1.0.4', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
