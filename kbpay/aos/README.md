@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1013
-        versionName "1.0.4"
+        versionCode 1015
+        versionName "1.6"
         multiDexEnabled true
 
     }
@@ -120,6 +120,7 @@ dependencies {
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
+* 전화관련 정보 읽기 권한인 READ_PHONE_STATE는 API LEVEL 29까지만 적용되어 API LEVEL 30 부터 전면광고 화면에서 전화상태 체크를 하지 않습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
@@ -202,7 +203,7 @@ private fun checkRequiredPermission() {
     <uses-permission android:name = "android.permission.VIBRATE"/>
 
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="29"/>
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
@@ -335,7 +336,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.6.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -379,7 +380,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.4’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.6’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -394,7 +395,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1013
+        versionCode 1015
         versionName "1.0"
         multiDexEnabled true
     }
@@ -440,7 +441,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.0.4', ext: 'aar'
+    implementation name: 'touchad-sdk-1.6', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -505,7 +506,7 @@ fun openKBApprlNoMenu(context: Context, cid: String)
 val data: String = 
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
 \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 
 TouchAdPlatform.openKBAdvertise(context, cid, data);
@@ -574,7 +575,7 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
 ~~~
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
  \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 ~~~
 
@@ -589,7 +590,7 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
       "touchad": 
          "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
           \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     }
   },
@@ -609,11 +610,11 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
       "touchad": 
 		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
          \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://2.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
