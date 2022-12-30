@@ -24,7 +24,7 @@
 * SKT 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For SKT 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 17 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
 
 
 
@@ -43,13 +43,13 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
 
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 31
-        versionCode 1024
-        versionName "1.6"
+        targetSdkVersion 33
+        versionCode 1025
+        versionName "1.7"
         multiDexEnabled true
 
     }
@@ -126,6 +126,7 @@ dependencies {
 * 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
     **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
+* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20221230 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
@@ -225,9 +226,9 @@ private fun checkRequiredPermission() {
     
     <!--저장소 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <!--저장소 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    
+    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
         android:icon="@mipmap/tc_ic_launcher"
@@ -423,7 +424,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.6.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.7.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -467,7 +468,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.6’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.7’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -476,13 +477,13 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 17
-        targetSdkVersion 31
-        versionCode 1024
+        targetSdkVersion 33
+        versionCode 1025
         versionName "1.0"
         multiDexEnabled true
     }
@@ -528,7 +529,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.6', ext: 'aar'
+    implementation name: 'touchad-sdk-1.7', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
