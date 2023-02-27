@@ -19,7 +19,7 @@ use_frameworks!
 target 'TouchadSDK' do
 
   pod 'SnapKit', '~> 4.0.1'
-  pod 'Alamofire', '~> 4.8.2'
+  pod 'Alamofire', '~> 5.6.4'
   pod 'ObjectMapper', '~> 4.2.0'
   pod 'JWTDecode', '~> 2.5.0'
   
@@ -74,8 +74,9 @@ func requestPermission() {
 * @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값(필수 값, true = 상용 도메인, false = 개발 도메인)
 * @param cid: NH멤버스 회원관리번호 (필수)
 * @param userInfoString: apns custom data 문자열(필수)
+* CommonWebViewController : UIViewController를 상속받는 확장 클래스
 */
-@objc public class NHAdvertiseViewController: UINavigationController
+@objc public class NHAdvertiseViewController: CommonWebViewController
 
 ```
 
@@ -307,3 +308,4 @@ NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithI
 * 프로젝트명 : ios_touchAd
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
+
