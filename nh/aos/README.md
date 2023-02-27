@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0.0"
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
 
     }
@@ -152,6 +152,13 @@ dependencies {
     <!--저장소 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:icon="@mipmap/tc_ic_launcher"
         android:label="@string/app_name"
@@ -161,6 +168,15 @@ dependencies {
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
         android:theme="@style/TouchAdTheme">
+
+        <!--CPI 광고 처리를 위한 서비스 -->
+        <service
+            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:protectionLevel="signature">
+        </service>
 
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
@@ -247,11 +263,26 @@ dependencies {
 * NH터치애드 메인 테마명 : name = TouchAdTheme
 
 
+
+### Foreground Service
+
+* NH터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
+
+* targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
+
+* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
+
+* NH터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
+
+  ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
+
+
+
 #  NH터치애드 SDK For NH멤버스 설치 가이드
 
 * 정상적인 제휴서비스를 위한 NH터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-nh-1.0.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-nh-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -295,7 +326,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.0.0’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.1’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -310,8 +341,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
     }
 
@@ -356,7 +387,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-nh-1.0.0', ext: 'aar'
+    implementation name: 'touchad-sdk-nh-1.1', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -404,7 +435,7 @@ val isProd: Boolean = true(상용 도메인) 또는 false(개발 도메인)
 val data: String = 
 "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
 \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 
 TouchAdPlatform.openNHAdvertise(context, isProd, cid, data);
@@ -439,7 +470,7 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
 ~~~
 "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
  \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 ~~~
 
@@ -456,7 +487,7 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
       "touchad": 
          "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
           \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
     }
   },
@@ -476,11 +507,11 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
       "touchad": 
 		"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
          \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://1.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
