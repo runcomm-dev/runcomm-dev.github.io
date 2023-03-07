@@ -152,6 +152,7 @@ dependencies {
     <!--저장소 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+    <!--CPI 광고 처리를 위한 설정 -->
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
