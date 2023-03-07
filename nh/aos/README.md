@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1001
-        versionName "1.1"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
 
     }
@@ -282,7 +282,7 @@ dependencies {
 
 * 정상적인 제휴서비스를 위한 NH터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-nh-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-nh-1.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -326,7 +326,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.1’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.2’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -341,8 +341,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 1001
-        versionName "1.1"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
     }
 
@@ -387,7 +387,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-nh-1.1', ext: 'aar'
+    implementation name: 'touchad-sdk-nh-1.2', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -435,7 +435,7 @@ val isProd: Boolean = true(상용 도메인) 또는 false(개발 도메인)
 val data: String = 
 "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
 \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 
 TouchAdPlatform.openNHAdvertise(context, isProd, cid, data);
@@ -470,7 +470,7 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
 ~~~
 "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
  \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
 ~~~
 
@@ -487,7 +487,7 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
       "touchad": 
          "{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
           \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\",\"platformId\":\"NHJ\"}"
     }
   },
@@ -507,11 +507,11 @@ TouchAdPlatform.openNHEarningMenu(context, isProd, cid)
       "touchad": 
 		"{\"cid\":\"3jmkTE4EYMVBAw/1SFdzUA==\",
          \"apprlNo\":\"12345678\",\"title\":\"NH멤버스\",\"body\":\"NH띠링에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f1.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fnh%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://1.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
