@@ -232,6 +232,14 @@ private fun checkRequiredPermission() {
     
     <!--안드로이드 13 이상부터 사용하는 알림 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    
+    <!--CPI 광고 처리를 위한 설정 -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <application
         android:icon="@mipmap/tc_ic_launcher"
