@@ -31,7 +31,6 @@
 ### SDK build.gradle(app)
 
 * 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 자바비동기 이벤트 기반 라이브러리(rxjava2)</b>를 사용합니다.
-* lib폴더에 신용카드 스캔을 하기위한 card.io-5.5.1.jar 파일을 컴파일 하기위해 dependencies에 선언문이 추가되어 있습니다.
 * buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
 * buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
@@ -39,7 +38,6 @@
 ~~~
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
 
@@ -48,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 33
-        versionCode 1026
-        versionName "1.8"
+        versionCode 1028
+        versionName "2.0"
         multiDexEnabled true
 
     }
@@ -74,19 +72,6 @@ android {
             consumerProguardFile 'proguard-rules.pro'
         }
     }
-    //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 명시를 해 주어야
-    // Android Studio에서 Run이 정상 동작을 한다.
-    //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
-    flavorDimensions "flavors"
-    productFlavors{
-        dev{
-            dimension "flavors"
-        }
-        product{
-            dimension "flavors"
-        }
-
-    }
 
     compileOptions {
         sourceCompatibility 1.8
@@ -103,17 +88,16 @@ android {
 
 dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
-    compile files('libs/card.io-5.5.1.jar')
+    implementation 'com.google.android.material:material:1.6.0'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
-
 }
 ~~~
 
@@ -127,6 +111,7 @@ dependencies {
     **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
 * Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20221230 업데이트)
+* Android 13 부터 알림 권한인 POST_NOTIFICATIONS(위험 레벨 권한) 를 선언해야 Push 알림을 받을 수 있기 때문에 이 권한을 사용해야 합니다.(20230428 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
@@ -138,8 +123,8 @@ private fun checkRequiredPermission() {
         permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
         if (permissionHelper!!.checkPermissionInApp()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val canDrawble = Settings.canDrawOverlays(context)
-                if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                val canDrawable = Settings.canDrawOverlays(context)
+                if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
                     val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
                     startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
                 }
@@ -161,8 +146,8 @@ private fun checkRequiredPermission() {
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val canDrawble = Settings.canDrawOverlays(context)
-                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                    val canDrawable = Settings.canDrawOverlays(context)
+                    if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
                         startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
                     }
@@ -232,8 +217,7 @@ private fun checkRequiredPermission() {
     
     <!--안드로이드 13 이상부터 사용하는 알림 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    
-    <!--CPI 광고 처리를 위한 설정 -->
+
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -286,16 +270,6 @@ private fun checkRequiredPermission() {
             android:exported="false">
         </activity>
 
-        <!-- 카드 스캔 화면 -->
-        <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardScanActivity"
-            android:theme="@style/TouchAdTheme"
-            android:configChanges="orientation"
-            android:screenOrientation="portrait"
-            android:exported="false">
-        </activity>
-
-        <activity android:name="io.card.payment.DataEntryActivity"
-            android:exported="false"/>
     </application>
 </manifest>
 ~~~
@@ -435,7 +409,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.8.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -479,7 +453,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.8’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.0’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -494,7 +468,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 33
-        versionCode 1026
+        versionCode 1028
         versionName "1.0"
         multiDexEnabled true
     }
@@ -540,7 +514,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.8', ext: 'aar'
+    implementation name: 'touchad-sdk-2.0', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -567,12 +541,12 @@ dependencies {
 object TouchAdPlatform {  
 
 /**
-* 터치애드 전면광고 화면 시작
+* 돈 버는 교통 전면광고 화면 시작
 */
 fun  openMPAdvertise(context: Context, mbrId: String, data: String)
 
 /**
-* 터치애드 화면 시작
+* 돈 버는 교통 화면 시작
 */
 fun  openMPTouchAdMenu(context: Context, mbrId: String, adPushYn: String, gender: String, birthYear: String, callback: (() -> Unit)?)
 
@@ -595,15 +569,15 @@ fun  openMPBanner(context: Context, mbrId: String, adPushYn: String, gender: Str
 
 
 
-##  터치애드 전면광고 화면 시작
+##  돈 버는 교통 전면광고 화면 시작
 
-*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
-*  회원가입된 유저일경우 전면광고 화면으로 이동합니다.
-*  비회원일경우 약관 동의 거치고 전면광고 화면으로 이동합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 돈 버는 교통 전면광고 화면을 띄울 경우 호출합니다.
+*  회원가입된 유저일경우 전면광고 화면을 이용할 수 있습니다.
+*  비회원일경우 약관 동의 거쳐야 전면광고 화면을 이용할 수 있습니다.
 *  mbrId = 멤버십카드번호
 *  data = 푸시데이터(FCM 항목 참고하시면 됩니다.)
 
-*  아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+*  아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openMPAdvertise(context, mbrId, data);
@@ -613,13 +587,13 @@ TouchAdPlatform.openMPAdvertise(context, mbrId, data);
 
 ##  참여적립 화면 시작
 
-*  MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
-*  mbrId = 멤버십카드번호
-*  adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
-*  gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
-*  birthYear = 생년월일 YYMMDD 6자리 
+* MP 앱 내에서 참여적립 메뉴를 선택하면 약관동의 거치고 참여적립 화면을 시작할때 호출합니다.
+* mbrId = 멤버십카드번호
+* adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
+* gender = 성별 1(남), 2(여), 3(2000년이후 남), 4(2000년이후 여)
+* birthYear = 생년월일 YYMMDD 6자리 
 
-*  아래는 참여적립 화면 시작함수 호출 예시입니다.
+* 아래는 참여적립 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn, gender, birthYear)
@@ -627,9 +601,9 @@ TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn, gender, birthYear)
 
 
 
-## 터치애드 화면 시작
+## 돈 버는 교통 화면 시작
 
-*  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+*  MP 앱 내에서 돈 버는 교통 메뉴를 선택하면 약관동의 거치고 돈 버는 교통 화면을 시작할때 호출합니다.
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
 *  mbrId = 멤버십카드번호
 *  adPushYn = MP광고푸시수신여부 (반드시 대문자 "Y" 또는 "N"으로 작성해야합니다.)
@@ -637,7 +611,7 @@ TouchAdPlatform.openMPEarningMenu(context, mbrId, adPushYn, gender, birthYear)
 *  birthYear = 생년월일 YYMMDD 6자리 
 *  mpCallback = MP 설정화면 호출을 위한 콜백변수
 
-*  아래는 터치애드 화면 시작함수 호출 예시입니다.
+*  아래는 돈 버는 교통 화면 시작함수 호출 예시입니다.
 
 ~~~
 mpCallback = {
@@ -679,13 +653,9 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
 
 
 
-##  터치애드 교통카드 등록
+##  돈 버는 교통 교통카드 등록
 
-* 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
-
-* CardIO 오픈소스 + GoogleVisionAPI 기술을 사용하고 있습니다.
-
-* CardIO 오픈소스는 아파치 라이센스이며 SDK설정화면내 라이센스 사용에 대한 고지를 하였습니다. 
+* 돈 버는 교통 화면 메인 상단에 교통카드 등록 이미지를 터치시 교통카드 등록 화면으로 이동합니다.
 
 
 
@@ -703,7 +673,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -715,7 +685,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     }
   },
   "apns": {
@@ -732,7 +702,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896"
+		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
