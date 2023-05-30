@@ -34,31 +34,7 @@ end
 ```
 
 ## 권한 설정
-1. **카메라**
-* 교통카드 카메라 인식기능에 카메라 사용권한이 필요합니다.
-* 사용자가 권한을 거부하는 경우 카메라 기능이 동작하지 않습니다.
-* 앱프로젝트 info.plist 에 아래내용을 추가합니다.
-
-| Key | Type | Value |
-|---|---|---|
-| Information Property List|Dictionary|(1 item)|
-| Privacy - Camera Usage Description|String|교통카드 사진촬영을 위해 필요합니다.|
-
-* 앱프로젝트에서 카메라 권한을 직접 설정할 경우 아래와 같은 메서드를 작성하여 사용합니다.
-
-```
-func requestCameraPermission(){
-        AVCaptureDevice.requestAccess(for: .video, completionHandler: { (granted: Bool) in
-            if granted {
-                print("Camera: 권한 허용")
-            } else {
-                print("Camera: 권한 거부")
-            }
-        })
-    }
-```
-
-2. **광고식별자(IDFA)**
+1. **광고식별자(IDFA)**
 * 터치애드는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
 * IOS 14 이상부터 IDFA 를 사용하기 위해선 명시적으로 사용자 동의를 얻어야 합니다.
 * 시뮬레이터로 동작 시 IDFA가 고정값으로 적용됩니다.(시뮬레이터에서 IDFA를 가져올 경우 값이 0으로 표현되어 화면진입이 되지 않는 문제 대응)
@@ -104,7 +80,7 @@ public class TASDKManager: NSObject {
 func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
 /**
-* 터치애드 화면 시작
+* 돈 버는 교통 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
 * @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
@@ -114,7 +90,7 @@ func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, bir
 func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String, callback: (() -> Void)?)
 
 /**
-* 터치애드 전면광고 오픈
+* 돈 버는 교통 전면광고 오픈
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param userInfo: apns custom data
 */
@@ -142,13 +118,13 @@ func openMPBanner(_ mbrId : String, adPushYn : String, gender : String, birthYea
 ~~## 터치애드 초기화~~
 
 
-## 터치애드 전면광고 화면 시작 (백그라운드, IOS >= 10)
+## 돈 버는 교통 전면광고 화면 시작 (백그라운드, IOS >= 10)
 
-*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 돈 버는 교통 전면광고 화면을 띄울 경우 호출합니다.
 
 *  MP 앱이 미실행 상태이거나 백그라운드 상태일 경우 MP앱이 실행된후에 전면광고 화면이 나타납니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         
@@ -158,13 +134,13 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 }
 ```
 
-## 터치애드 전면광고 화면 시작 (포그라운드, IOS >= 10)
+## 돈 버는 교통 전면광고 화면 시작 (포그라운드, IOS >= 10)
 
-*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 돈 버는 교통 전면광고 화면을 띄울 경우 호출합니다.
 
 *  MP 앱이 실행 상태일 경우 전면광고 화면이 나타납니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
 ```
 func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     printd("willPresentNotification = \(notification.request.content.userInfo)")
@@ -175,11 +151,11 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent noti
 }
 ```
 
-## 터치애드 전면광고 화면 시작 (IOS < 10)
+## 돈 버는 교통 전면광고 화면 시작 (IOS < 10)
 
-*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 터치애드의 전면광고 화면을 띄울 경우 호출합니다.
+*  MP 지하철 교통카드 승하차 푸시 수신하고 이때 돈 버는 교통 전면광고 화면을 띄울 경우 호출합니다.
 
-* 아래는 터치애드 전면광고 시작함수 호출 예시입니다.
+* 아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
 ```
 private func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
     //[AnyHashable : Any]
@@ -201,13 +177,13 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
 ```
 
-## 터치애드 화면 시작
+## 돈 버는 교통 화면 시작
 
-*  MP 앱 내에서 터치애드 메뉴를 선택하면 약관동의 거치고 터치애드 화면을 시작할때 호출합니다.
+*  MP 앱 내에서 돈 버는 교통 메뉴를 선택하면 약관동의 거치고 돈 버는 교통 화면을 시작할때 호출합니다.
 
 *  MP 앱 광고푸시 설정 화면을 오픈할수 있는 기능을 콜백 영역내 구현합니다.  (옵션)
 
-*  아래는 터치애드 화면 시작함수 호출 예시입니다.
+*  아래는 돈 버는 교통 화면 시작함수 호출 예시입니다.
 ```
 TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915", callback:{() in 
  //MP 앱내 광고푸시 설정화면 오픈
@@ -274,13 +250,10 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
 ```
 
 
-## 터치애드 교통카드 등록
+## 돈 버는 교통 교통카드 등록
 
-* 교통카드를 카메라스캔하여 자동으로 입력하는 기능이 들어있습니다. (양각 카드 경우 인식률이 떨어질수 있습니다.)
+* 돈 버는 교통 화면 메인 상단에 교통카드 등록 이미지를 터치시 교통카드 등록 화면으로 이동합니다.
 
-* CardIO 오픈소스 + GoogleVisionAPI 기술을 사용하고 있습니다.
-
-* CardIO 오픈소스는 아파치 라이센스이며 SDK설정화면내 라이센스 사용에 대한 고지를 하였습니다. 
 
 ## FCM 전송
 
@@ -299,7 +272,7 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     }
   },
   "apns": {
@@ -315,7 +288,7 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D1916%26cardIdx%3D896%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     },
     "fcm_options": {
       "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
