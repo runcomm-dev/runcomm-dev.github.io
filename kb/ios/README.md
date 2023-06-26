@@ -99,6 +99,14 @@ func requestPermission() {
 */
 @objc public class KBApprlNoMenuViewController: UINavigationController
 
+/**
+* 오늘의 쇼핑적립 ViewController
+* 생성자 매개변수
+* @param cid: KB 회원관리번호 (필수)
+* @param cd: 광고 외부관리코드 (선택)
+*/
+@objc public class KBShoppingViewController: UINavigationController
+
 ```
 
 
@@ -205,7 +213,7 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo
 * Swift
 ```
 let userInfoString: String = 
-"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",\"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"
+"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"
 
 let navController = KBAdvertiseViewController(cid: "회원관리번호", userInfoString: userInfoString)
 self.present(navController, animated:true, completion: nil)
@@ -213,7 +221,7 @@ self.present(navController, animated:true, completion: nil)
 
 * Objective-C
 ```
-NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"];
+NSString* useInfo = [[NSString alloc] initWithString:@"{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"];
 
 KBAdvertiseViewController* vc = [[KBAdvertiseViewController alloc] initWithCid:@"회원관리번호" userInfoString:useInfo];
 [self.navigationController presentViewController:vc animated:YES completion:nil];
@@ -309,6 +317,46 @@ KBApprlNoMenuViewController* vc = [[KBApprlNoMenuViewController alloc] initWithC
 [self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
+## 오늘의 쇼핑적립 화면 시작(매일매일 쇼핑적립 메인 화면 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS광고에 있는 '더보기' 선택 시 호출합니다.
+
+*  cd값에 nil을 넣어야 매일매일 쇼핑적립 메인 화면으로 이동합니다.
+
+*  아래는 오늘의 쇼핑적립 ViewController 호출 예시입니다.
+
+* Swift
+```
+let navController = KBShoppingViewController(cid: "회원관리번호", cd: nil)
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBShoppingViewController* vc = [[KBShoppingViewController alloc] initWithCid:@"회원관리번호" cd:nil];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
+```
+
+## 오늘의 쇼핑적립 화면 시작(CPS 광고 터치 시 바로 광고 상세레이어 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS 광고 선택 시 호출합니다.
+
+*  cd값에 광고 외부관리 코드를 넣어야 매일매일 쇼핑적립 메인 화면 위에 나타나는 광고 상세 레이어로 이동합니다.
+
+*  아래는 참여이력 ViewController 호출 예시입니다.
+
+* Swift
+```
+let navController = KBShoppingViewController(cid: "회원관리번호", cd: "광고 외부관리코드")
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBShoppingViewController* vc = [[KBShoppingViewController alloc] initWithCid:@"회원관리번호" cd:"광고 외부관리코드"];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
+```
+
 ## FCM 전송
 
 * 쓱쌓는 푸시 송신 시 KB 에서 제공한 Public API를 이용하여 Push(FCM)를 전송합니다.
@@ -326,7 +374,7 @@ KBApprlNoMenuViewController* vc = [[KBApprlNoMenuViewController alloc] initWithC
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+      "touchad": "{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"
     }
   },
   "apns": {
@@ -343,10 +391,10 @@ KBApprlNoMenuViewController* vc = [[KBApprlNoMenuViewController alloc] initWithC
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-      "{\"cid\":\"poqwer233\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FonOff%3D1%26cd%3D1916%26cardIdx%3D621%22%7D\"}"
+      "{\"cid\":\"poqwer2886\",\"apprlNo\":\"1\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",\"custom-type\":\"touchad\",\"custom-body\":\"%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fkb%3FapprlNo%3D12345678%22%7D\"}"
     },
     "fcm_options": {
-      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
