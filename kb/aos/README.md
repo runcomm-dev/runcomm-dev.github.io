@@ -23,7 +23,7 @@
 * KB 버전 쓱쌓 SDK에 대한 설명입니다.
 * 쓱쌓 SDK For KB 리브메이트 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 30, compileSdkVersion : 30 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
 
 
 
@@ -35,27 +35,32 @@
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
 
 android {
-
-    compileSdkVersion 30
+    namespace 'kr.co.touchad.sdk'
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 1011
-        versionName "1.0.2"
+        targetSdkVersion 31
+        versionCode 1018
+        versionName "1.9"
         multiDexEnabled true
 
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
         debug {
             minifyEnabled false
-            useProguard false
             buildConfigField "boolean", "TraceEnable", "true"
             buildConfigField "boolean", "TraceVerbose", "true"
             buildConfigField "java.util.Date", "buildTime", "new java.util.Date(" +
@@ -72,23 +77,14 @@ android {
             consumerProguardFile 'proguard-rules.pro'
         }
     }
-    //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 명시를 해 주어야
-    // Android Studio에서 Run이 정상 동작을 한다.
-    //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
-    /*flavorDimensions "flavors"
-    productFlavors{
-        dev{
-            dimension "flavors"
-        }
-        product{
-            dimension "flavors"
-        }
-
-    }*/
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
     }
 
     lintOptions {
@@ -110,6 +106,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'androidx.activity:activity:1.3.0-alpha08'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
 }
 ~~~
 
@@ -120,6 +118,7 @@ dependencies {
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
+* 전화관련 정보 읽기 권한인 READ_PHONE_STATE는 API LEVEL 29까지만 적용되어 API LEVEL 30 부터 전면광고 화면에서 전화상태 체크를 하지 않습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
@@ -202,13 +201,20 @@ private fun checkRequiredPermission() {
     <uses-permission android:name = "android.permission.VIBRATE"/>
 
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="29"/>
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <!--저장소 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
 
     <application
         android:icon="@mipmap/tc_ic_launcher"
@@ -231,12 +237,14 @@ private fun checkRequiredPermission() {
 
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
-            android:theme="@style/TouchAdTheme">
+            android:theme="@style/TouchAdTheme"
+            android:exported="false">
         </activity>
 
         <!-- 전면 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
-            android:theme="@style/TouchAdTheme">
+            android:theme="@style/TouchAdTheme"
+            android:exported="false">
         </activity>
         
     </application>
@@ -333,68 +341,52 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.9.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
 ## build.gradle 설정 
 
   1. **build.gradle(project)파일수정**
-     *      * 광고Id를 가져와 쓱쌓 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
-            * allprojects안의 repositories에 maven내용을 추가합니다.
+     *      * 광고Id를 가져와 쓱쌓 광고참여를 하기 위해 plugins에 com.google.gms.google-services를 추가합니다.
             * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
             * 아래는 실제 작성된 예시입니다.
 ~~~
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-   repositories {
-       google()
-       jcenter()
-   }
-   dependencies {
-       classpath 'com.android.tools.build:gradle:4.0.1'
-       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
-       classpath 'com.google.gms:google-services:4.2.0'
-       // NOTE: Do not place your application dependencies here; they belong
-       // in the individual module build.gradle files
-   }
-}
-
-allprojects {
-   repositories {
-       maven { url 'https://maven.google.com'}
-
-       jcenter()
-       google()
-   }
-}
-
-task clean(type: Delete) {
-   delete rootProject.buildDir
+plugins {
+    id 'com.android.application' version '7.4.1' apply false
+    id 'com.android.library' version '7.4.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.8.20' apply false
+    id 'com.google.gms.google-services' version '4.3.8' apply false
 }
 ~~~
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0.2’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.9’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.google.gms.google-services'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
 
 android {
-    compileSdkVersion 30
+    namespace 'kb pay 패키지명'
+    compileSdkVersion 31
 
     defaultConfig {
-        applicationId "kr.co.touchad"
+        applicationId "kb pay 패키지명"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 1011
+        targetSdkVersion 31
+        versionCode 1018
         versionName "1.0"
         multiDexEnabled true
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -405,8 +397,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
     }
 
     lintOptions {
@@ -414,12 +410,6 @@ android {
         // Or, if you prefer, you can continue to check for errors in release builds,
         // but continue the build even when errors are found:
         abortOnError false
-    }
-}
-
-repositories {
-    flatDir{
-        dirs 'libs'
     }
 }
 
@@ -438,7 +428,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.0.2', ext: 'aar'
+    implementation name: 'touchad-sdk-1.9', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -485,7 +475,12 @@ fun  openKBNoticeMenu(context: Context)
 * 참여이력 화면 시작
 */
 fun openKBApprlNoMenu(context: Context, cid: String)
- 
+
+/**
+* 오늘의 쇼핑적립 화면 시작
+*/
+fun openKBShoppingMenu(context: Context, cid: String, cd: String?)
+
 }
 ~~~
 
@@ -503,7 +498,7 @@ fun openKBApprlNoMenu(context: Context, cid: String)
 val data: String = 
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
 \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 
 TouchAdPlatform.openKBAdvertise(context, cid, data);
@@ -550,10 +545,34 @@ TouchAdPlatform.openKBNoticeMenu(context)
 ## 참여이력 화면 시작
 
 *  KB 앱 내에서 참여이력을 선택 시 호출합니다.
-*  아래는 공지사항 화면 시작함수 호출 예시입니다.
+*  아래는 참여이력 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openKBApprlNoMenu(context, cid)
+~~~
+
+## 오늘의 쇼핑적립 화면 시작(매일매일 쇼핑적립 메인 화면 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS광고에 있는 '더보기' 선택 시 호출합니다.
+*  cid = 고객관리번호(필수값)
+*  cd = 광고 외부관리 코드(선택)
+*  cd값에 null을 넣어야 매일매일 쇼핑적립 메인 화면으로 이동합니다.
+*  아래는 오늘의 쇼핑적립 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBShoppingMenu(Context, cid, null)
+~~~
+
+## 오늘의 쇼핑적립 화면 시작(CPS 광고 터치 시 바로 광고 상세레이어 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS 광고 선택 시 호출합니다.
+*  cid = 고객관리번호(필수값)
+*  cd = 광고 외부관리 코드(선택)
+*  cd값에 광고 외부관리 코드를 넣어야 매일매일 쇼핑적립 메인 화면 위에 나타나는 광고 상세 레이어로 이동합니다.
+*  아래는 오늘의 쇼핑적립 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
 ~~~
 
 ##  쓱쌓 푸시 수신 시
@@ -572,7 +591,7 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
 ~~~
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
  \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 ~~~
 
@@ -587,7 +606,7 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
       "touchad": 
          "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
           \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     }
   },
@@ -607,11 +626,11 @@ TouchAdPlatform.openKBApprlNoMenu(context, cid)
       "touchad": 
 		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
          \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2fta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
