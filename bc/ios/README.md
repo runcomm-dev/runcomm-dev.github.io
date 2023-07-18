@@ -109,7 +109,7 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusmoney?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusMoneyMenu("머니회원번호")
+함수호출 - TASDKManager.openBCPlusMoneyMenu(mbrId)
 ```
 
 ## 플러스적립 화면 시작(출석체크 클로징 배너)
@@ -120,7 +120,7 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusbanner?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusBannerMenu("머니회원번호")
+함수호출 - TASDKManager.openBCPlusBannerMenu(mbrId)
 ```
 
 ## 플러스적립 화면 시작(출석체크 메인 화면)
@@ -131,7 +131,7 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusmain?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusMainMenu("머니회원번호")
+함수호출 - TASDKManager.openBCPlusMainMenu(mbrId)
 ```
 
 
