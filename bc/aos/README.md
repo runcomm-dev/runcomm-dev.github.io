@@ -539,10 +539,11 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 * BC 페이북 앱 내 머니박스 당첨 화면 팝업 화면에서 '머니박스 3개 더 받기' 버튼을 터치시 호출합니다.
 * mbrId = 머니회원번호(필수)
 
-* 아래는 플러스적립 화면 시작함수 호출 예시입니다.
+* 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
 
 ~~~
-TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
+딥링크 - app://plusmoney?mbrId={머니회원번호}
+함수 호출 - TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 클로징배너)
@@ -550,10 +551,11 @@ TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
 * BC 페이북 앱 내 출석체크 클로징 배너에서 '머니 PLUS' 버튼을 터치시 호출합니다.
 * mbrId = 머니회원번호(필수)
 
-* 아래는 플러스적립 화면 시작함수 호출 예시입니다.
+* 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
 
 ~~~
-TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
+딥링크 - app://plusbanner?mbrId={머니회원번호}
+함수 호출 - TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 메인 화면)
@@ -561,10 +563,11 @@ TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
 * BC 페이북 앱 내 출석체크 메인 화면에서 플러스적립 화면 시작 버튼을 터치시 호출합니다.
 * mbrId = 머니회원번호(필수)
 
-* 아래는 플러스적립 화면 시작함수 호출 예시입니다.
+* 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
 
 ~~~
-TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
+딥링크 - app://plusmain?mbrId={머니회원번호}
+함수 호출 - TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
 ~~~
 
 ## Sample 프로젝트
@@ -573,4 +576,3 @@ TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
 * 패키지명 : kr.co.touchad
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
-
