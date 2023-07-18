@@ -544,7 +544,7 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusmoney?mbrId={머니회원번호}
 
-함수 호출 - TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 클로징배너)
@@ -557,7 +557,7 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusbanner?mbrId={머니회원번호}
 
-함수 호출 - TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 메인 화면)
@@ -570,7 +570,7 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusmain?mbrId={머니회원번호}
 
-함수 호출 - TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
 ~~~
 
 ## Sample 프로젝트
