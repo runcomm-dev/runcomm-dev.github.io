@@ -1,0 +1,526 @@
+# TouchAd 소개
+* 매체사 제휴서비스인 런컴광고전송플랫폼 서비스(이하, 터치애드) 안드로이드 앱용 SDK 설치에 관한 내용입니다.
+* 터치애드 서비스는 광고 포인트 적립 플랫폼입니다.
+* 제휴앱 회원이 터치애드를 통해 광고를 이용할 경우 포인트 적립이 됩니다.
+* 사용자가 광고 이용 후 포인트 적립이 이루어집니다.
+
+  ## 광고전송 SDK 주요기능
+  * 모바일 웹 광고 화면 : 일반적인 광고적립 앱 서비스(예:캐시슬라이드)에 사용되는 광고목록화면
+  * NH Pay 통합 회원 가입 : NH Pay 통신사를 이용하는 회원 대상
+
+   ## 매체사 앱 SDK 연동을 위한 업무진행 절차
+  * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
+  * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
+  * 추가코딩 (SDK 초기화)
+  * 테스트용 apk 파일 광고 SDK 담당자에게 전달
+  * 광고 SDK 기능테스트 (가입, 적립, 차감)
+  * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
+
+
+# TouchAd SDK For NH Pay 구성
+
+* NH Pay 버전 터치애드 SDK에 대한 설명입니다.
+* 터치애드 SDK For NH Pay 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
+* SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
+
+
+
+### SDK build.gradle(app)
+
+* 터치애드 SDK는 <b>http라이브러리(retrofit2, OkHttp3), 자바비동기 이벤트 기반 라이브러리(rxjava2)</b>를 사용합니다.
+* buildTypes안에 proguard에 대한 debug와 release에 따른 동작, stacktrace에 대한 예외처리를 위한 buildConfigField를 설정하였습니다.
+* buildTypes에 consumerProguard File을 사용하여 라이브러리 프로젝트에서 난독화 규칙을 제공하여 매체사 앱 프로젝트에 자동으로 규칙이 적용 됩니다.
+* 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
+
+~~~
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'kr.co.touchad.sdk'
+    compileSdkVersion 33
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1000
+        versionName "1.0"
+        multiDexEnabled true
+
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            buildConfigField "boolean", "TraceEnable", "true"
+            buildConfigField "boolean", "TraceVerbose", "true"
+            buildConfigField "java.util.Date", "buildTime", "new java.util.Date(" +
+                    System.currentTimeMillis() + "L)"
+            consumerProguardFile 'proguard-rules.pro'
+
+        }
+        release {
+            minifyEnabled false
+            buildConfigField "boolean", "TraceEnable", "false"
+            buildConfigField "boolean", "TraceVerbose", "false"
+            buildConfigField "java.util.Date", "buildTime", "new java.util.Date(" +
+                    System.currentTimeMillis() + "L)"
+            consumerProguardFile 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
+    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'commons-codec:commons-codec:1.13'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+}
+~~~
+
+
+
+### AndroidManifest.xml
+
+* SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
+* 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
+* 권한 내용 중 WRITE_EXTERNAL_STORAGE와 같이 **위험 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
+    **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
+* 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
+* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20221230 업데이트)
+* Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
+* 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
+* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
+~~~
+private fun checkRequiredPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return
+        }
+        permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
+        if (permissionHelper!!.checkPermissionInApp()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val canDrawable = Settings.canDrawOverlays(context)
+                if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                    startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+                }
+            }
+            return
+        }
+        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
+
+            override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
+                mPermissions = permissions as Array<String?>
+                mGrantResults = grantResults
+                if (grantResults!!.isNotEmpty()) {
+                    for (i in grantResults.indices) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
+                            break
+                        }
+                    }
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val canDrawable = Settings.canDrawOverlays(context)
+                    if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+                    }
+                }
+            }
+        })
+    }
+~~~
+
+
+
+
+* 참조용으로 SDK 내에 설정된 내용입니다.
+~~~
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="kr.co.touchad.sdk">
+
+    <!--인터넷 접속(네트워크 작업)을 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!--네트워크 연결확인을 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+    <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+
+    <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
+
+    <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
+    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:icon="@mipmap/tc_ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/tc_ic_launcher_round"
+        android:supportsRtl="true"
+        android:allowBackup="false"
+        android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true"
+        android:theme="@style/TouchAdTheme"
+        android:requestLegacyExternalStorage="true">
+
+        <!--CPI 광고 처리를 위한 서비스 -->
+        <service
+            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:protectionLevel="signature">
+        </service>
+
+        <!-- 웹뷰화면 -->
+        <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
+            android:theme="@style/TouchAdTheme"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="false">
+        </activity>
+    </application>
+</manifest>
+~~~
+
+
+
+### proguard-rules.pro 파일
+
+* jar형태로 구성된 라이브러리와 달리, **aar로 배포되는 터치애드 SDK는 난독화 규칙을 포함하여 배포할 수 있습니다.** proguard-rules.pro 파일에 아래 내용이 추가되었으며 매체사 앱 측에서 별도로 **SDK에 대한 난독화 규칙을 추가하지 않습니다.**
+* 추가로 retrofit2및 stactrace 오류보고에 대한 난독화 예외도 추가합니다.
+* NH Pay에서 사용하는 code mix에 아래 SDK에 추가된 난독화 예외 코드를 적용해야 합니다.
+* 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
+~~~
+-keep class kr.co.touchad.sdk.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
+-keep class android.support.** { *; }
+-keep class com.google.** { *; }
+-keepparameternames#파라미터 이름을 난독화x
+
+#소스 파일의 라인을 섞지 않는 옵션 ( 안하게되면 나중에 stacktrace보고 어느 line에서 오류가 난 것인지 확인 불가)
+-keepattributes SourceFile,LineNumberTable
+
+# retrofit2
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn retrofit2.**
+-dontnote okhttp3.**
+-dontnote retrofit2.Platform
+-dontnote retrofit2.Platform$IOS$MainThreadExecutor
+-dontwarn retrofit2.Platform$Java8
+-keepattributes Signature
+-keepattributes Exceptions
+
+##---------------Begin: proguard configuration for Gson  ----------
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-dontwarn sun.misc.**
+#-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { <fields>; }
+
+# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+##---------------End: proguard configuration for Gson  ----------
+
+##---------------Begin: proguard configuration for card.io  ----------
+
+# ---- REQUIRED card.io CONFIG ----------------------------------------
+# card.io is a native lib, so anything crossing JNI must not be changed
+
+# Don't obfuscate DetectionInfo or public fields, since
+# it is used by native methods
+-keep class io.card.payment.DetectionInfo
+-keepclassmembers class io.card.payment.DetectionInfo {
+    public *;
+}
+
+-keep class io.card.payment.CreditCard
+-keep class io.card.payment.CreditCard$1
+-keepclassmembers class io.card.payment.CreditCard {
+  *;
+}
+
+-keepclassmembers class io.card.payment.CardScanner {
+  *** onEdgeUpdate(...);
+}
+
+# Don't mess with classes with native methods
+
+-keepclasseswithmembers class * {
+    native <methods>;
+}
+
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+-keep public class io.card.payment.* {
+    public protected *;
+}
+
+# required to suppress errors when building on android 22
+-dontwarn io.card.payment.CardIOActivity
+
+##---------------End: proguard configuration for card.io  ------------
+
+-keepclassmembers enum * {
+   public static **[] values();
+   public static ** valueOf(java.lang.String);
+}
+~~~
+
+
+
+### styles.xml 파일
+
+* 터치애드는 메인 테마로 AppCompat.Light.NoActionBar를 사용하며 테마 네이밍이 겹치지 않도록 주의합니다.
+
+* 터치애드 메인 테마명 : name = TouchAdTheme
+
+
+
+### Foreground Service
+
+* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
+
+* targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
+
+* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
+
+* 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
+
+     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
+
+
+
+
+
+
+
+#  TouchAd SDK For NH Pay 설치 가이드
+
+* 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
+* 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
+* 제공한 **touchad-sdk-1.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+
+
+
+## build.gradle 설정 
+
+  1. **build.gradle(project)파일수정**
+     * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
+     * allprojects안의 repositories에 maven내용을 추가합니다.
+     * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
+     * 아래는 실제 작성된 예시입니다.
+~~~
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.4.1' apply false
+    id 'com.android.library' version '7.4.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.6.20' apply false
+    id 'com.google.gms.google-services' version '4.3.8' apply false
+}
+~~~
+
+  2. **build.gradle(app)파일수정**
+     *  아래 dependencies 영역내용을 추가합니다.
+     *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0’, ext: ’arr’를 추가합니다.
+     *  중복된 내용은 생략 합니다.
+~~~
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
+
+android {
+    namespace 'NH Pay 패키지 명"'
+    compileSdkVersion 33
+
+    defaultConfig {
+        applicationId "NH Pay 패키지 명"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1000
+        versionName "1.0"
+        multiDexEnabled true
+    }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    implementation 'com.google.firebase:firebase-core:17.4.3'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
+    implementation files('libs/touchad-sdk-1.0.aar')
+
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'androidx.multidex:multidex:2.0.0'
+}
+~~~
+
+## Android 12 버전 업데이트로 인한 AndroidManifest 설정 안내
+  1. **android:exported 속성 추가**
+     * 이 속성은 SDK에도 반영이 되어있습니다.
+     * 앱이 Android 12 이상을 타겟팅하고 인텐트 필터를 사용하는 액티비티나 서비스, broadcast receiver를 포함할 시 명시적으로 선언해야합니다.
+     * 명시적으로 선언을 하지 않을 경우 Android 12 이상을 실행하는 기기에 앱을 설치할 수 없습니다.
+     * 앱 구성요소에 LAUNCHER 카테고리가 포함된 경우 android:exported를 true로 설정합니다.
+     * 아래 링크 주소는 안드로이드 Developers 공식 관련 내용입니다.
+     * https://developer.android.com/about/versions/12/behavior-changes-12?hl=ko
+     * https://developer.android.com/guide/topics/manifest/activity-element?hl=ko#exported
+
+## 터치애드 플랫폼 클래스 함수
+
+   - 기능을 모듈화하여 Static 함수형태로 호출합니다.
+   -  아래 간략한 설명입니다.
+
+~~~
+object TouchAdPlatform {  
+
+/**
+* 포인트플러스 배너 화면 시작
+*/
+fun  openNHPAYBannerMenu(context: Context, encData: String)
+
+~~~
+
+
+
+##  돈 버는 교통 전면광고 화면 시작
+
+*  NH Pay앱 내에서 포인트 플러스 메뉴를 선택하면 약관동의 거치고 포인트 플러스 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openNHPAYBannerMenu(context, encData);
+~~~
+
+## Sample 프로젝트
+
+* 프로젝트명 : and_TouchAd
+* 패키지명 : kr.co.touchad
+* 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
+* 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
