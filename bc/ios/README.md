@@ -5,6 +5,7 @@
 * 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
+* XCode 14.3.1 Build , Minimum Deployment 11.0 , Swift 5.8.1 입니다.
 
 
 ## CocoaPods 설정
@@ -79,21 +80,24 @@ public class TASDKManager: NSObject {
 
 /**
 * 플러스적립 화면 시작(머니박스 당첨화면)
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값 (필수, true = 상용 도메인, false = 개발 도메인)
 * @param mbrId: BC 페이북 머니회원번호 (필수)
 */
-func openBCPlusMoneyMenu(_ mbrId : String)
+func openBCPlusMoneyMenu(_ isProd : Bool, _ mbrId : String)
 
 /**
 * 플러스적립 화면 시작(출석체크 클로징 배너)
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값 (필수, true = 상용 도메인, false = 개발 도메인)
 * @param mbrId: BC 페이북 머니회원번호 (필수)
 */
-func openBCPlusBannerMenu(_ mbrId : String)
+func openBCPlusBannerMenu(_ isProd : Bool, _ mbrId : String)
 
 /**
 * 플러스적립 화면 시작(출석체크 메인 화면)
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값 (필수, true = 상용 도메인, false = 개발 도메인)
 * @param mbrId: BC 페이북 머니회원번호 (필수)
 */
-func openBCPlusMainMenu(_ mbrId : String)
+func openBCPlusMainMenu(_ isProd : Bool, _ mbrId : String)
 
 }
 ```
@@ -109,7 +113,10 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusmoney?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusMoneyMenu(mbrId)
+함수호출 - 
+let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
+
+TASDKManager.openBCPlusMoneyMenu(isProd, mbrId)
 ```
 
 ## 플러스적립 화면 시작(출석체크 클로징 배너)
@@ -120,7 +127,10 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusbanner?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusBannerMenu(mbrId)
+함수호출 - 
+let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
+
+TASDKManager.openBCPlusBannerMenu(isProd, mbrId)
 ```
 
 ## 플러스적립 화면 시작(출석체크 메인 화면)
@@ -131,7 +141,10 @@ func openBCPlusMainMenu(_ mbrId : String)
 ```
 딥링크 - app://plusmain?mbrId={머니회원번호}
 
-함수호출 - TASDKManager.openBCPlusMainMenu(mbrId)
+함수호출 - 
+let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
+
+TASDKManager.openBCPlusMainMenu(isProd, mbrId)
 ```
 
 
