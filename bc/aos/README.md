@@ -5,16 +5,16 @@
 * 사용자가 광고 이용 후 포인트 적립이 이루어집니다.
 
   ## 광고전송 SDK 주요기능
-  * 모바일 웹 광고 화면 : 일반적인 광고적립 앱 서비스(예:캐시슬라이드)에 사용되는 광고목록화면
-  * BC 페이북 통합 회원 가입 : BC 페이북을 이용하는 회원 대상
+    * 모바일 웹 광고 화면 : 일반적인 광고적립 앱 서비스(예:캐시슬라이드)에 사용되는 광고목록화면
+    * BC 페이북 통합 회원 가입 : BC 페이북을 이용하는 회원 대상
 
-   ## 매체사 앱 SDK 연동을 위한 업무진행 절차
-  * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
-  * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
-  * 추가코딩 (SDK 초기화)
-  * 테스트용 apk 파일 광고 SDK 담당자에게 전달
-  * 광고 SDK 기능테스트 (가입, 적립, 차감)
-  * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
+  ## 매체사 앱 SDK 연동을 위한 업무진행 절차
+    * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
+    * 광고 SDK 라이브러리(.aar) 앱프로젝트 Import.
+    * 추가코딩 (SDK 초기화)
+    * 테스트용 apk 파일 광고 SDK 담당자에게 전달
+    * 광고 SDK 기능테스트 (가입, 적립, 차감)
+    * 상세한 기술적 내용은 아래 TouchAd SDK 구성, TouchAd SDK 설치 가이드 항목을 참고하시기 바랍니다.
 
 
 # TouchAd SDK For BC 페이북 구성
@@ -44,8 +44,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
 
     }
@@ -100,6 +100,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'androidx.activity:activity:1.3.0-alpha08'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
 }
 ~~~
 
@@ -109,8 +111,8 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
-    **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
+* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다.
+  **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
 * 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
@@ -365,7 +367,7 @@ private fun checkRequiredPermission() {
 
 * 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
 
-     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
+  ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
 
 
 
@@ -377,17 +379,17 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
-## build.gradle 설정 
+## build.gradle 설정
 
-  1. **build.gradle(project)파일수정**
-     * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
-     * allprojects안의 repositories에 maven내용을 추가합니다.
-     * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
-     * 아래는 실제 작성된 예시입니다.
+1. **build.gradle(project)파일수정**
+    * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
+    * allprojects안의 repositories에 maven내용을 추가합니다.
+    * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
+    * 아래는 실제 작성된 예시입니다.
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
@@ -418,11 +420,11 @@ task clean(type: Delete) {
 }
 ~~~
 
-  2. **build.gradle(app)파일수정**
-     *  아래 dependencies 영역내용을 추가합니다.
-     *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0’, ext: ’arr’를 추가합니다.
-     *  중복된 내용은 생략 합니다.
+2. **build.gradle(app)파일수정**
+    *  아래 dependencies 영역내용을 추가합니다.
+    *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
+    *  dependencies 영역에 Implementation name: ’touchad-sdk-1.2’, ext: ’arr’를 추가합니다.
+    *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -435,8 +437,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 23
         targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
     }
 
@@ -488,28 +490,30 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation name: 'touchad-sdk-1.0', ext: 'aar'
+    implementation name: 'touchad-sdk-1.2', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
     implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.activity:activity:1.3.0-alpha08'
+    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
 }
 ~~~
 
 ## Android 12 버전 업데이트로 인한 AndroidManifest 설정 안내
-  1. **android:exported 속성 추가**
-     * 이 속성은 SDK에도 반영이 되어있습니다.
-     * 앱이 Android 12 이상을 타겟팅하고 인텐트 필터를 사용하는 액티비티나 서비스, broadcast receiver를 포함할 시 명시적으로 선언해야합니다.
-     * 명시적으로 선언을 하지 않을 경우 Android 12 이상을 실행하는 기기에 앱을 설치할 수 없습니다.
-     * 앱 구성요소에 LAUNCHER 카테고리가 포함된 경우 android:exported를 true로 설정합니다.
-     * 아래 링크 주소는 안드로이드 Developers 공식 관련 내용입니다.
-     * https://developer.android.com/about/versions/12/behavior-changes-12?hl=ko
-     * https://developer.android.com/guide/topics/manifest/activity-element?hl=ko#exported
+1. **android:exported 속성 추가**
+    * 이 속성은 SDK에도 반영이 되어있습니다.
+    * 앱이 Android 12 이상을 타겟팅하고 인텐트 필터를 사용하는 액티비티나 서비스, broadcast receiver를 포함할 시 명시적으로 선언해야합니다.
+    * 명시적으로 선언을 하지 않을 경우 Android 12 이상을 실행하는 기기에 앱을 설치할 수 없습니다.
+    * 앱 구성요소에 LAUNCHER 카테고리가 포함된 경우 android:exported를 true로 설정합니다.
+    * 아래 링크 주소는 안드로이드 Developers 공식 관련 내용입니다.
+    * https://developer.android.com/about/versions/12/behavior-changes-12?hl=ko
+    * https://developer.android.com/guide/topics/manifest/activity-element?hl=ko#exported
 
 ## 터치애드 플랫폼 클래스 함수
 
-   - 기능을 모듈화하여 Static 함수형태로 호출합니다.
-   -  아래 간략한 설명입니다.
+- 기능을 모듈화하여 Static 함수형태로 호출합니다.
+-  아래 간략한 설명입니다.
 
 ~~~
 object TouchAdPlatform {  
@@ -517,17 +521,17 @@ object TouchAdPlatform {
 /**
 * 플러스적립 화면 시작(머니박스 당첨화면)
 */
-fun  openBCPlusMoneyMenu(context: Context, mbrId: String)
+fun  openBCPlusMoneyMenu(context: Context, isProd: Boolean, mbrId: String)
 
 /**
 * 플러스적립 화면 시작(출석체크 클로징배너)
 */
-fun  openBCPlusBannerMenu(context: Context, mbrId: String)
+fun  openBCPlusBannerMenu(context: Context, isProd: Boolean, mbrId: String)
 
 /**
 * 플러스적립 화면 시작(출석체크 메인 화면)
 */
-fun  openBCPlusMainMenu(context: Context, mbrId: String)
+fun  openBCPlusMainMenu(context: Context, isProd: Boolean, mbrId: String)
 
 }
 ~~~
@@ -537,6 +541,7 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ##  플러스적립 화면 시작(머니박스 당첨화면)
 
 * BC 페이북 앱 내 머니박스 당첨 화면 팝업 화면에서 '머니박스 3개 더 받기' 버튼을 터치시 호출합니다.
+* isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수, true = 상용 도메인, false = 개발 도메인)
 * mbrId = 머니회원번호(필수)
 
 * 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
@@ -544,12 +549,13 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusmoney?mbrId={머니회원번호}
 
-함수호출 - TouchAdPlatform.openBCPlusMoneyMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusMoneyMenu(context, isProd, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 클로징배너)
 
 * BC 페이북 앱 내 출석체크 클로징 배너에서 '머니 PLUS' 버튼을 터치시 호출합니다.
+* isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수, true = 상용 도메인, false = 개발 도메인)
 * mbrId = 머니회원번호(필수)
 
 * 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
@@ -557,12 +563,13 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusbanner?mbrId={머니회원번호}
 
-함수호출 - TouchAdPlatform.openBCPlusBannerMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusBannerMenu(context, isProd, mbrId)
 ~~~
 
 ##  플러스적립 화면 시작(출석체크 메인 화면)
 
 * BC 페이북 앱 내 출석체크 메인 화면에서 플러스적립 화면 시작 버튼을 터치시 호출합니다.
+* isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수, true = 상용 도메인, false = 개발 도메인)
 * mbrId = 머니회원번호(필수)
 
 * 아래는 딥링크를 통해 호출하는 플러스적립 화면 시작함수 예시입니다.
@@ -570,7 +577,7 @@ fun  openBCPlusMainMenu(context: Context, mbrId: String)
 ~~~
 딥링크 - app://plusmain?mbrId={머니회원번호}
 
-함수호출 - TouchAdPlatform.openBCPlusMainMenu(context, mbrId)
+함수호출 - TouchAdPlatform.openBCPlusMainMenu(context, isProd, mbrId)
 ~~~
 
 ## Sample 프로젝트
