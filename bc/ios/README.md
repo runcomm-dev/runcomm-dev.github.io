@@ -5,40 +5,32 @@
 * 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* XCode 14.3.1 Build , Minimum Deployment 11.0 , Swift 5.8.1 입니다.
-
 
 ## CocoaPods 설정
-1. **Podfile 파일수정**
-* SDK에서 사용하는 cocoapod 라이브러리 입니다.
-* 프로젝트 Podfile 에 아래내용을 추가합니다.
+1. **CocoaPods를 사용하지 않습니다.**
+
+
+## Swift Package Manager 설정
+1. **Package Dependencies 추가**
+* 프로젝트 > 프로젝트아이콘 > Package Dependencies 탭 클릭
+* PROJECT 프로젝트아이콘 클릭 
+* Packages 메뉴 + 버튼 클릭
+* 팝업화면 > Github 선택 > Search or Enter Package URL > 아래주소 입력
 ```
-source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '11.0'
+https://github.com/runcomm/ios_TouchAd_spm.git
 
-use_frameworks!
+Dependency Rule : Exact Version 
 
-target 'TouchadSDK' do
+Version : 0.0.1
 
-  pod 'SnapKit', '~> 4.0.1'
-  pod 'Alamofire', '~> 4.8.2'
-  pod 'ObjectMapper', '~> 4.2.0'
-  pod 'JWTDecode', '~> 2.5.0'
-end
-post_install do |installer|
-    installer.generated_projects.each do |project|
-        project.targets.each do |target|
-            target.build_configurations.each do |config|
-                config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
-            end
-        end
-    end
-    installer.pods_project.targets.each do |target|
-        target.build_configurations.each do |config|
-            config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-        end
-    end
-end
+Add to Project : BC앱프로젝트
+```
+2. **Package Dependencies 확인**
+* 프로젝트 > Package Dependencies 메뉴 > Package 확인
+```
+TouchadSDK 0.0.1
+
+Alamofire 4.8.2
 ```
 
 ## 권한 설정
