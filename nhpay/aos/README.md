@@ -6,7 +6,7 @@
 
   ## 광고전송 SDK 주요기능
   * 모바일 웹 광고 화면 : 일반적인 광고적립 앱 서비스(예:캐시슬라이드)에 사용되는 광고목록화면
-  * NH Pay 통합 회원 가입 : NH Pay 통신사를 이용하는 회원 대상
+  * NH Pay 통합 회원 가입 : NH Pay를 이용하는 회원 대상
 
    ## 매체사 앱 SDK 연동을 위한 업무진행 절차
   * 광고 SDK에서 발급하는 platform id값을 획득하여 앱프로젝트 코딩에 사용.
@@ -105,8 +105,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
-    implementation 'commons-codec:commons-codec:1.13'
-    implementation 'org.apache.commons:commons-lang3:3.9'
 }
 ~~~
 
@@ -507,15 +505,25 @@ fun  openNHPAYBannerMenu(context: Context, encData: String)
 
 
 
-##  돈 버는 교통 전면광고 화면 시작
+## 포인트플러스 화면 시작
 
 *  NH Pay앱 내에서 포인트 플러스 메뉴를 선택하면 약관동의 거치고 포인트 플러스 화면을 시작할 때 호출합니다.
 *  encData = 암호화된 사용자 정보(필수)
 
-*  아래는 돈 버는 교통 전면광고 시작함수 호출 예시입니다.
+*  아래는 포인트플러스 시작함수 호출 예시입니다.
 
 ~~~
-TouchAdPlatform.openNHPAYBannerMenu(context, encData);
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYBannerMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYBannerMenu(context, encData)
 ~~~
 
 ## Sample 프로젝트
