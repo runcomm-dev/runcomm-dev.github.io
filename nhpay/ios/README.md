@@ -2,10 +2,8 @@
 
 * 정상적인 제휴서비스를 위한 터치애드SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
-* target deployment 10.0 : 10_TouchadSDK.xcframework (빌드 테스트용)
-* target deployment 11.0 : 11_TouchadSDK.xcframework (빌드 테스트용)
-* 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework폴더를 선택합니다.
+* 제공한 TouchadSDK.xcframework, Alamofire.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
+* 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework, Alamofire.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
 * XCode 14.3.1 Build , Minimum Deployment 10.0 입니다.
 
@@ -18,8 +16,8 @@
 1. **광고식별자(IDFA)**
 * 터치애드는 IDFA 값을 사용하여 사용자의 광고 사용 트래킹을 합니다.  
 * IOS 14 이상부터 IDFA 를 사용하기 위해선 명시적으로 사용자 동의를 얻어야 합니다.
-* 시뮬레이터로 동작 시 IDFA가 고정값으로 적용됩니다.(시뮬레이터에서 IDFA를 가져올 경우 값이 0으로 표현되어 화면진입이 되지 않는 문제 대응)
-* 시뮬레이터용 IDFA 고정값 : aabc1234-a12b-a123-abcd-abcde1234567
+~~* 시뮬레이터로 동작 시 IDFA가 고정값으로 적용됩니다.(시뮬레이터에서 IDFA를 가져올 경우 값이 0으로 표현되어 화면진입이 되지 않는 문제 대응)~~
+~~* 시뮬레이터용 IDFA 고정값 : aabc1234-a12b-a123-abcd-abcde1234567~~
 * 앱프로젝트 info.plist 에 아래내용을 추가합니다.
 
 | Key | Type | Value |
@@ -78,9 +76,9 @@ func openNHPAYBannerMenu(_ encData : String)
 * 아래는 포인트플러스 화면 시작함수 호출 예시입니다.
 ```
 var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
-var endData = encrypt(orgData);
+var encData = encrypt(orgData);
 
-TASDKManager.openNHPAYBannerMenu(endData)
+TASDKManager.openNHPAYBannerMenu(encData)
 ```
 
 ~~## 2차 푸시 결과 화면 (백그라운드, IOS >= 10)~~
@@ -94,7 +92,7 @@ TASDKManager.openNHPAYBannerMenu(endData)
 ## 빌드시  주의사항
 
 * 애플 앱스토어 혹은 TestFlight 를 통한 앱배포시에는 x86_64 아키텍쳐 빌드가 제외된 SDK 로 빌드하여야 합니다.
-* arm64  빌드 SDK :  폴더/ios_touchAd_sdk/배포용/TouchadSDK.xcframework
+* arm64  빌드 SDK :  폴더/ios_touchAd_sdk/TouchadSDK.xcframework
 ~~* XCode 에뮬레이터를 이용한 앱 개발시에는 x86_64 아키텍쳐 빌드가 포함된 SDK 로 빌드하여야 합니다.~~
 ~~* arm64, x86_64 빌드 SDK : 폴더/ios_touchAd_sdk/개발용/TouchadSDK.xcframework~~
 
