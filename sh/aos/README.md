@@ -22,7 +22,7 @@
 * 신한카드 올댓 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For 신한카드 올댓 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
 * gradle version : 7.0.2, gradle plugin version : 1.5.10 (으)로 빌드되었습니다.
 
 
@@ -42,13 +42,13 @@ plugins {
 
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0"
+        targetSdkVersion 33
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
 
     }
@@ -144,7 +144,7 @@ private fun checkRequiredPermission() {
 
                     if (isGranted)
                     {
-                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE)
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
                         {
                             startGalleryPage()
                         }
@@ -206,6 +206,9 @@ private fun checkRequiredPermission() {
 
     <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <queries>
         <intent>
@@ -339,7 +342,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -360,7 +363,7 @@ plugins {
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
-     *  dependencies 영역에 Implementation files('libs/touchad-sdk-1.0.aar')를 추가합니다.
+     *  dependencies 영역에 Implementation files('libs/touchad-sdk-1.1.aar')를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -371,14 +374,14 @@ plugins {
 
 android {
     namespace 'kr.co.touchad'
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 1000
-        versionName "1.0"
+        targetSdkVersion 33
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
     }
 
@@ -428,7 +431,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.0.aar')
+    implementation files('libs/touchad-sdk-1.1.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
