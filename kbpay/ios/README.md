@@ -11,6 +11,7 @@
 1. **Podfile 파일수정**
 * SDK에서 사용하는 cocoapod 라이브러리 입니다.
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
+* 필독 : Xcode 15.0 빌드 부터 라이브러리 deployment target을 11.0으로 설정하는 내용이 추가되었습니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
 platform :ios, '11.0'
@@ -23,6 +24,15 @@ target 'TouchadSDK' do
   pod 'ObjectMapper', '~> 4.2.0'
   pod 'JWTDecode', '~> 2.5.0'
   
+end
+post_install do |installer|
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+        target.build_configurations.each do |config|
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+         end
+    end
+  end
 end
 ```
 
@@ -98,6 +108,14 @@ func requestPermission() {
 * @param cid: KB 회원관리번호 (필수)
 */
 @objc public class KBApprlNoMenuViewController: UINavigationController
+
+/**
+* 오늘의 쇼핑적립 ViewController
+* 생성자 매개변수
+* @param cid: KB 회원관리번호 (필수)
+* @param cd: 광고 외부관리코드 (선택)
+*/
+@objc public class KBShoppingViewController: UINavigationController
 
 ```
 
@@ -306,6 +324,46 @@ self.present(navController, animated:true, completion: nil)
 * Objective-C
 ```
 KBApprlNoMenuViewController* vc = [[KBApprlNoMenuViewController alloc] initWithCid:@"회원관리번호"];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
+```
+
+## 오늘의 쇼핑적립 화면 시작(매일매일 쇼핑적립 메인 화면 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS광고에 있는 '더보기' 선택 시 호출합니다.
+
+*  cd값에 nil을 넣어야 매일매일 쇼핑적립 메인 화면으로 이동합니다.
+
+*  아래는 오늘의 쇼핑적립 ViewController 호출 예시입니다.
+
+* Swift
+```
+let navController = KBShoppingViewController(cid: "회원관리번호", cd: nil)
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBShoppingViewController* vc = [[KBShoppingViewController alloc] initWithCid:@"회원관리번호" cd:nil];
+[self.navigationController presentViewController:vc animated:YES completion:nil];
+```
+
+## 오늘의 쇼핑적립 화면 시작(CPS 광고 터치 시 바로 광고 상세레이어 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS 광고 선택 시 호출합니다.
+
+*  cd값에 광고 외부관리 코드를 넣어야 매일매일 쇼핑적립 메인 화면 위에 나타나는 광고 상세 레이어로 이동합니다.
+
+*  아래는 참여이력 ViewController 호출 예시입니다.
+
+* Swift
+```
+let navController = KBShoppingViewController(cid: "회원관리번호", cd: "광고 외부관리코드")
+self.present(navController, animated:true, completion: nil)
+```
+
+* Objective-C
+```
+KBShoppingViewController* vc = [[KBShoppingViewController alloc] initWithCid:@"회원관리번호" cd:"광고 외부관리코드"];
 [self.navigationController presentViewController:vc animated:YES completion:nil];
 ```
 
