@@ -23,7 +23,7 @@
 * KB 버전 쓱쌓 SDK에 대한 설명입니다.
 * 쓱쌓 SDK For KB 리브메이트 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
 
 
 
@@ -42,13 +42,13 @@ plugins {
 
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1018
-        versionName "1.9"
+        targetSdkVersion 33
+        versionCode 1022
+        versionName "2.3"
         multiDexEnabled true
 
     }
@@ -107,7 +107,6 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
     implementation 'androidx.activity:activity:1.3.0-alpha08'
-    implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
 }
 ~~~
 
@@ -121,46 +120,89 @@ dependencies {
 * 전화관련 정보 읽기 권한인 READ_PHONE_STATE는 API LEVEL 29까지만 적용되어 API LEVEL 30 부터 전면광고 화면에서 전화상태 체크를 하지 않습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
+* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20231103 업데이트)
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return
+            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                startGalleryPage()
             }
-            permissionHelper = PermissionHelper(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), context)
-            if (permissionHelper!!.checkPermissionInApp()) {
+            return
+        }
+
+        permissionHelper = PermissionHelper(arrayOf(permission), context)
+
+        if (permissionHelper!!.checkPermissionInApp()) {
+            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+            {
+                startGalleryPage()
+            }
+            else if (permission == Manifest.permission.READ_PHONE_STATE)
+            {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val canDrawble = Settings.canDrawOverlays(context)
-                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                    if (!canDrawble) {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+
+                        resultOverlay.launch(intent)
                     }
                 }
-                return
             }
-            permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
-    
-                override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
-                    mPermissions = permissions as Array<String?>
-                    mGrantResults = grantResults
-                    if (grantResults!!.isNotEmpty()) {
-                        for (i in grantResults.indices) {
-                            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                                Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
+            override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
+                if (grantResults!!.isNotEmpty()) {
+                    var isGranted : Boolean = true
+                    for (i in grantResults.indices) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && permissions[i] == Manifest.permission.READ_PHONE_STATE)
+                            {
+                                continue
+                            }
+                            else
+                            {
+                                isGranted = false
                                 break
                             }
                         }
                     }
-    
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val canDrawble = Settings.canDrawOverlays(context)
-                        if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                            startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+
+                    if (isGranted)
+                    {
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+                        {
+                            startGalleryPage()
+                        }
+                        else if (permission == Manifest.permission.READ_PHONE_STATE)
+                        {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                val canDrawble = Settings.canDrawOverlays(context)
+                                if (!canDrawble) {
+                                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                                    resultOverlay.launch(intent)
+                                }
+                            }
                         }
                     }
+                    else
+                    {
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+                        {
+                            if (touchAdWebView!!.mFilePathCallback != null) {
+                                //파일을 한번 오픈했으면 mFilePathCallback 를 초기화를 해줘야함
+                                // -- 그렇지 않으면 다시 파일 오픈 시 열리지 않는 경우 발생
+                                touchAdWebView!!.mFilePathCallback!!.onReceiveValue(null)
+                                touchAdWebView!!.mFilePathCallback = null
+                            }
+                        }
+                        Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            })
+            }
+        })
 }
 ~~~
 
@@ -197,17 +239,17 @@ private fun checkRequiredPermission() {
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!--진동 사용 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name = "android.permission.VIBRATE"/>
-
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="29"/>
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
-    <!--저장소 사용 권한 // 권한 레벨 : 위험-->
+    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <queries>
         <intent>
@@ -224,7 +266,8 @@ private fun checkRequiredPermission() {
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme">
+        android:theme="@style/TouchAdTheme"
+        android:requestLegacyExternalStorage="true">
 
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
@@ -341,7 +384,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.9.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.3.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -355,7 +398,7 @@ private fun checkRequiredPermission() {
 plugins {
     id 'com.android.application' version '7.4.1' apply false
     id 'com.android.library' version '7.4.1' apply false
-    id 'org.jetbrains.kotlin.android' version '1.8.20' apply false
+    id 'org.jetbrains.kotlin.android' version '1.6.20' apply false
     id 'com.google.gms.google-services' version '4.3.8' apply false
 }
 ~~~
@@ -363,7 +406,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.9’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.3’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -374,13 +417,13 @@ plugins {
 
 android {
     namespace 'kb pay 패키지명'
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "kb pay 패키지명"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1018
+        targetSdkVersion 33
+        versionCode 1022
         versionName "1.0"
         multiDexEnabled true
     }
@@ -414,21 +457,20 @@ android {
 }
 
 dependencies {
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.9', ext: 'aar'
+    implementation files('libs/touchad-sdk-2.3.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -498,7 +540,7 @@ fun openKBShoppingMenu(context: Context, cid: String, cd: String?)
 val data: String = 
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
 \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 
 TouchAdPlatform.openKBAdvertise(context, cid, data);
@@ -591,7 +633,7 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
 ~~~
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
  \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 ~~~
 
@@ -606,7 +648,7 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
       "touchad": 
          "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
           \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     }
   },
@@ -626,11 +668,11 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
       "touchad": 
 		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
          \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://2.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
