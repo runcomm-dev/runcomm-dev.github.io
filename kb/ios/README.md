@@ -406,9 +406,7 @@ KBShoppingViewController* vc = [[KBShoppingViewController alloc] initWithCid:@"�
 ## 빌드시  주의사항
 
 * 애플 앱스토어 혹은 TestFlight 를 통한 앱배포시에는 x86_64 아키텍쳐 빌드가 제외된 SDK 로 빌드하여야 합니다.
-* armv7, arm64  빌드 SDK :  폴더/ios_touchAd_sdk/배포용/TouchadSDK.framework
-* XCode 에뮬레이터를 이용한 앱 개발시에는 x86_64 아키텍쳐 빌드가 포함된 SDK 로 빌드하여야 합니다.
-* armv7, arm64, x86_64 빌드 SDK : 폴더/ios_touchAd_sdk/개발용/TouchadSDK.framework
+* arm64  빌드 SDK :  폴더/ios_touchAd_sdk/TouchadSDK.framework
 
 ## Sample 프로젝트
 
