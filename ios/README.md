@@ -13,7 +13,7 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '12.0'
 use_frameworks!
 
 target 'TouchadSDK' do
@@ -28,6 +28,7 @@ post_install do |installer|
     installer.pods_project.targets.each do |target|
         target.build_configurations.each do |config|
             config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
         end
     end
 end
@@ -272,7 +273,7 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     }
   },
   "apns": {
@@ -288,10 +289,10 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     },
     "fcm_options": {
-      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
