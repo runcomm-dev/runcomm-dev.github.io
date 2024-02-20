@@ -23,7 +23,7 @@
 * KB 버전 쓱쌓 SDK에 대한 설명입니다.
 * 쓱쌓 SDK For KB 리브메이트 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 31, compileSdkVersion : 31 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
 
 
 
@@ -35,27 +35,32 @@
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
 
 android {
-
-    compileSdkVersion 31
+    namespace 'kr.co.touchad.sdk'
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1017
-        versionName "1.8"
+        targetSdkVersion 33
+        versionCode 1024
+        versionName "2.5"
         multiDexEnabled true
 
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
         debug {
             minifyEnabled false
-            useProguard false
             buildConfigField "boolean", "TraceEnable", "true"
             buildConfigField "boolean", "TraceVerbose", "true"
             buildConfigField "java.util.Date", "buildTime", "new java.util.Date(" +
@@ -72,23 +77,14 @@ android {
             consumerProguardFile 'proguard-rules.pro'
         }
     }
-    //라이브러리 모듈에 Flavor를 추가했을 경우 아래 옵션으로 기본 명시를 해 주어야
-    // Android Studio에서 Run이 정상 동작을 한다.
-    //Error:All flavors must now belong to a named flavor dimension. The flavor 'flavor_name' is not assigned to a flavor dimension.
-    /*flavorDimensions "flavors"
-    productFlavors{
-        dev{
-            dimension "flavors"
-        }
-        product{
-            dimension "flavors"
-        }
-
-    }*/
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
     }
 
     lintOptions {
@@ -110,6 +106,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'androidx.activity:activity:1.3.0-alpha08'
 }
 ~~~
 
@@ -123,46 +120,89 @@ dependencies {
 * 전화관련 정보 읽기 권한인 READ_PHONE_STATE는 API LEVEL 29까지만 적용되어 API LEVEL 30 부터 전면광고 화면에서 전화상태 체크를 하지 않습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
+* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20231103 업데이트)
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                return
+            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                startGalleryPage()
             }
-            permissionHelper = PermissionHelper(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), context)
-            if (permissionHelper!!.checkPermissionInApp()) {
+            return
+        }
+
+        permissionHelper = PermissionHelper(arrayOf(permission), context)
+
+        if (permissionHelper!!.checkPermissionInApp()) {
+            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+            {
+                startGalleryPage()
+            }
+            else if (permission == Manifest.permission.READ_PHONE_STATE)
+            {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val canDrawble = Settings.canDrawOverlays(context)
-                    if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
+                    if (!canDrawble) {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+
+                        resultOverlay.launch(intent)
                     }
                 }
-                return
             }
-            permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
-    
-                override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
-                    mPermissions = permissions as Array<String?>
-                    mGrantResults = grantResults
-                    if (grantResults!!.isNotEmpty()) {
-                        for (i in grantResults.indices) {
-                            if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                                Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
+            override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
+                if (grantResults!!.isNotEmpty()) {
+                    var isGranted : Boolean = true
+                    for (i in grantResults.indices) {
+                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && permissions[i] == Manifest.permission.READ_PHONE_STATE)
+                            {
+                                continue
+                            }
+                            else
+                            {
+                                isGranted = false
                                 break
                             }
                         }
                     }
-    
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        val canDrawble = Settings.canDrawOverlays(context)
-                        if (!canDrawble && permissionHelper!!.checkPermissionInApp()) {
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                            startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
+
+                    if (isGranted)
+                    {
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+                        {
+                            startGalleryPage()
+                        }
+                        else if (permission == Manifest.permission.READ_PHONE_STATE)
+                        {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                val canDrawble = Settings.canDrawOverlays(context)
+                                if (!canDrawble) {
+                                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                                    resultOverlay.launch(intent)
+                                }
+                            }
                         }
                     }
+                    else
+                    {
+                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
+                        {
+                            if (touchAdWebView!!.mFilePathCallback != null) {
+                                //파일을 한번 오픈했으면 mFilePathCallback 를 초기화를 해줘야함
+                                // -- 그렇지 않으면 다시 파일 오픈 시 열리지 않는 경우 발생
+                                touchAdWebView!!.mFilePathCallback!!.onReceiveValue(null)
+                                touchAdWebView!!.mFilePathCallback = null
+                            }
+                        }
+                        Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_SHORT).show()
+                    }
                 }
-            })
+            }
+        })
 }
 ~~~
 
@@ -199,19 +239,18 @@ private fun checkRequiredPermission() {
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <!--진동 사용 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name = "android.permission.VIBRATE"/>
-
     <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" android:maxSdkVersion="29"/>
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
-    <!--저장소 사용 권한 // 권한 레벨 : 위험-->
+    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
-    <!--CPI 광고 처리를 위한 설정 -->
+    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+
     <queries>
         <intent>
             <action android:name="android.intent.action.MAIN" />
@@ -227,7 +266,8 @@ private fun checkRequiredPermission() {
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme">
+        android:theme="@style/TouchAdTheme"
+        android:requestLegacyExternalStorage="true">
 
         <!--CPI 광고 처리를 위한 서비스 -->
         <service
@@ -326,86 +366,56 @@ private fun checkRequiredPermission() {
 
 
 
-### Foreground Service
-
-* 쓱쌓은 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
-
-* targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
-
-* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
-
-* 쓱쌓 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
-
-     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
-
-
-
 #  쓱쌓 SDK For KB 설치 가이드
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.8.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
 ## build.gradle 설정 
 
   1. **build.gradle(project)파일수정**
-     *      * 광고Id를 가져와 쓱쌓 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
-            * allprojects안의 repositories에 maven내용을 추가합니다.
+     *      * 광고Id를 가져와 쓱쌓 광고참여를 하기 위해 plugins에 com.google.gms.google-services를 추가합니다.
             * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
             * 아래는 실제 작성된 예시입니다.
 ~~~
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-   repositories {
-       google()
-       jcenter()
-   }
-   dependencies {
-       classpath 'com.android.tools.build:gradle:4.0.1'
-       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
-       classpath 'com.google.gms:google-services:4.2.0'
-       // NOTE: Do not place your application dependencies here; they belong
-       // in the individual module build.gradle files
-   }
-}
-
-allprojects {
-   repositories {
-       maven { url 'https://maven.google.com'}
-
-       jcenter()
-       google()
-   }
-}
-
-task clean(type: Delete) {
-   delete rootProject.buildDir
+plugins {
+    id 'com.android.application' version '7.4.1' apply false
+    id 'com.android.library' version '7.4.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.6.20' apply false
+    id 'com.google.gms.google-services' version '4.3.8' apply false
 }
 ~~~
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.8’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.5’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'com.google.gms.google-services'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
 
 android {
-    compileSdkVersion 31
+    namespace 'kb pay 패키지명'
+    compileSdkVersion 33
 
     defaultConfig {
-        applicationId "kr.co.touchad"
+        applicationId "kb pay 패키지명"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 1017
+        targetSdkVersion 33
+        versionCode 1024
         versionName "1.0"
         multiDexEnabled true
+    }
+
+    buildFeatures {
+        viewBinding = true
     }
 
     buildTypes {
@@ -416,8 +426,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = '11'
     }
 
     lintOptions {
@@ -428,28 +442,21 @@ android {
     }
 }
 
-repositories {
-    flatDir{
-        dirs 'libs'
-    }
-}
-
 dependencies {
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'com.google.firebase:firebase-messaging:20.2.1'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-    implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-1.8', ext: 'aar'
+    implementation files('libs/touchad-sdk-2.5.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -496,7 +503,12 @@ fun  openKBNoticeMenu(context: Context)
 * 참여이력 화면 시작
 */
 fun openKBApprlNoMenu(context: Context, cid: String)
- 
+
+/**
+* 오늘의 쇼핑적립 화면 시작
+*/
+fun openKBShoppingMenu(context: Context, cid: String, cd: String?)
+
 }
 ~~~
 
@@ -561,10 +573,34 @@ TouchAdPlatform.openKBNoticeMenu(context)
 ## 참여이력 화면 시작
 
 *  KB 앱 내에서 참여이력을 선택 시 호출합니다.
-*  아래는 공지사항 화면 시작함수 호출 예시입니다.
+*  아래는 참여이력 화면 시작함수 호출 예시입니다.
 
 ~~~
 TouchAdPlatform.openKBApprlNoMenu(context, cid)
+~~~
+
+## 오늘의 쇼핑적립 화면 시작(매일매일 쇼핑적립 메인 화면 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS광고에 있는 '더보기' 선택 시 호출합니다.
+*  cid = 고객관리번호(필수값)
+*  cd = 광고 외부관리 코드(선택)
+*  cd값에 null을 넣어야 매일매일 쇼핑적립 메인 화면으로 이동합니다.
+*  아래는 오늘의 쇼핑적립 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBShoppingMenu(Context, cid, null)
+~~~
+
+## 오늘의 쇼핑적립 화면 시작(CPS 광고 터치 시 바로 광고 상세레이어 이동)
+
+*  KB Pay Life 화면 내에서 런컴 CPS 광고 선택 시 호출합니다.
+*  cid = 고객관리번호(필수값)
+*  cd = 광고 외부관리 코드(선택)
+*  cd값에 광고 외부관리 코드를 넣어야 매일매일 쇼핑적립 메인 화면 위에 나타나는 광고 상세 레이어로 이동합니다.
+*  아래는 오늘의 쇼핑적립 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
 ~~~
 
 ##  쓱쌓 푸시 수신 시
