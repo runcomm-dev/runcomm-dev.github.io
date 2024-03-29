@@ -18,8 +18,8 @@ use_frameworks!
 
 target 'TouchadSDK' do
 
-  pod 'SnapKit', '~> 4.0.1'
-  pod 'Alamofire', '~> 4.8.2'
+  pod 'SnapKit', '~> 5.7.1'
+  pod 'Alamofire', '~> 5.9.0'
   pod 'ObjectMapper', '~> 4.2.0'
   pod 'JWTDecode', '~> 2.5.0'
   
@@ -62,6 +62,49 @@ func requestPermission() {
         } 
     } 
 }
+```
+
+## 개인정보 보호 매니페스트 파일(Privacy manifest file)
+1. **PrivacyInfo.xcprivacy**
+* 2024년 5월 1일부터 특정 API를 사용할 경우 허용된 사유가 포함된 PrivacyInfo.xcprivacy 파일이 프로젝트에 포함되어야 합니다.
+* 터치애드 SDK 산출물내 포함된 PrivacyInfo.xcprivacy에 아래내용을 추가했습니다.
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
 ```
 
 ## 터치애드 플랫폼 클래스 함수
@@ -273,7 +316,7 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     }
   },
   "apns": {
@@ -289,10 +332,10 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", bir
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
