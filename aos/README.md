@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 33
-        versionCode 1035
-        versionName "2.8"
+        versionCode 1037
+        versionName "2.9"
         multiDexEnabled true
 
     }
@@ -88,13 +88,13 @@ android {
 
 dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'com.google.android.material:material:1.3.0'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -449,7 +449,7 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 33
-        versionCode 1035
+        versionCode 1037
         versionName "1.0"
         multiDexEnabled true
     }
@@ -482,7 +482,8 @@ repositories {
 
 dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    implementation 'com.google.android.material:material:1.3.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:3.12.13'
@@ -495,7 +496,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-2.8', ext: 'aar'
+    implementation name: 'touchad-sdk-2.9', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -654,7 +655,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -666,7 +667,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
+         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     }
   },
   "apns": {
@@ -683,10 +684,10 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
+		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
