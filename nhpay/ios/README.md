@@ -5,7 +5,7 @@
 * 제공한 TouchadSDK.xcframework, Alamofire.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework, Alamofire.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* XCode 14.3.1 Build , Minimum Deployment 10.0 입니다.
+* XCode 15.0 Build, Minimum Deployment 12.0 입니다.
 
 
 ## CocoaPods 설정
@@ -55,6 +55,12 @@ public class TASDKManager: NSObject {
 */
 func openNHPAYBannerMenu(_ encData : String)
 
+/**
+* 매일매일 교통적립 화면 시작 
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+func openNHPAYApprlNoMenu(_ encData : String)
+
 }
 ```
 
@@ -79,6 +85,18 @@ var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
 var encData = encrypt(orgData);
 
 TASDKManager.openNHPAYBannerMenu(encData)
+```
+
+## 매일매일 교통적립 화면 시작
+
+*  NHPAY앱 내에서 포인트플러스 메뉴를 선택하면 약관동의 거치고 포인트플러스 화면을 시작할때 호출합니다.
+
+* 아래는 포인트플러스 화면 시작함수 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+TASDKManager.openNHPAYApprlNoMenu(encData)
 ```
 
 ~~## 2차 푸시 결과 화면 (백그라운드, IOS >= 10)~~
