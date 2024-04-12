@@ -44,8 +44,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 1004
-        versionName "1.4"
+        versionCode 1005
+        versionName "1.5"
         multiDexEnabled true
 
     }
@@ -185,9 +185,6 @@ private fun checkRequiredPermission() {
     <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
     <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
@@ -226,16 +223,6 @@ private fun checkRequiredPermission() {
         android:hardwareAccelerated="true"
         android:theme="@style/TouchAdTheme"
         android:requestLegacyExternalStorage="true">
-
-        <!--CPI 광고 처리를 위한 서비스 -->
-        <service
-            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE"
-            android:protectionLevel="signature">
-        </service>
-
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
             android:theme="@style/TouchAdTheme"
@@ -382,7 +369,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -426,7 +413,7 @@ task clean(type: Delete) {
 2. **build.gradle(app)파일수정**
     *  아래 dependencies 영역내용을 추가합니다.
     *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-    *  dependencies 영역에 Implementation name: ’touchad-sdk-1.4’, ext: ’arr’를 추가합니다.
+    *  dependencies 영역에 Implementation name: ’touchad-sdk-1.5’, ext: ’arr’를 추가합니다.
     *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -440,8 +427,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 1004
-        versionName "1.4"
+        versionCode 1005
+        versionName "1.5"
         multiDexEnabled true
     }
 
@@ -493,7 +480,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation name: 'touchad-sdk-1.4', ext: 'aar'
+    implementation name: 'touchad-sdk-1.5', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
