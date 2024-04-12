@@ -13,21 +13,35 @@
 * PROJECT 프로젝트아이콘 클릭 
 * Packages 메뉴 + 버튼 클릭
 * 팝업화면 > Github 선택 > Search or Enter Package URL > 아래주소 입력
+* 아래 두개의 패키지를 추가하셔야 합니다.
+* TouchadSDK SPM
 ```
 https://github.com/runcomm/ios_TouchAd_spm.git
 
 Dependency Rule : Exact Version 
 
-Version : 0.0.4
+Version : 0.0.6
 
 Add to Project : BC앱프로젝트
 ```
+
+* Alamofire SPM
+```
+https://github.com/Alamofire/Alamofire.git
+
+Dependency Rule : Exact Version 
+
+Version : 5.9.0
+
+Add to Project : BC앱프로젝트
+```
+
 2. **Package Dependencies 확인**
 * 프로젝트 > Package Dependencies 메뉴 > Package 확인
 ```
-TouchadSDK 0.0.4
+TouchadSDK 0.0.6
 
-Alamofire 4.9.1
+Alamofire 5.9.0
 ```
 
 ## 권한 설정
@@ -58,6 +72,49 @@ func requestPermission() {
         } 
     } 
 }
+```
+
+## 개인정보 보호 매니페스트 파일(Privacy manifest file)
+1. **PrivacyInfo.xcprivacy**
+* 2024년 5월 1일부터 특정 API를 사용할 경우 허용된 사유가 포함된 PrivacyInfo.xcprivacy 파일이 프로젝트에 포함되어야 합니다.
+* 터치애드 SDK 산출물내 포함된 PrivacyInfo.xcprivacy에 아래내용을 추가했습니다.
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
 ```
 
 ## 터치애드 플랫폼 클래스 함수
