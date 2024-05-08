@@ -5,24 +5,35 @@
 * 제공한 TouchadSDK.framework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.framework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.framework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
+* Xcode 15.1 Build, Minimum Deployment 13.0 입니다.
 
 
 ## CocoaPods 설정
 1. **Podfile 파일수정**
 * SDK에서 사용하는 cocoapod 라이브러리 입니다.
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
+* config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0' 설정은 Xcode 14.3 업데이트 후 앱 빌드 시 필요한 조건입니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '10.0'
+platform :ios, '13.0'
 use_frameworks!
 
 target 'TouchadSDK' do
 
-  pod 'SnapKit', '~> 4.0.1'
-  pod 'Alamofire', '~> 5.6.4'
+  pod 'Alamofire', '~> 5.9.0'
   pod 'ObjectMapper', '~> 4.2.0'
   pod 'JWTDecode', '~> 2.5.0'
   
+end
+
+post_install do |installer|
+    installer.generated_projects.each do |project|
+          project.targets.each do |target|
+              target.build_configurations.each do |config|
+                  config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+               end
+          end
+   end
 end
 ```
 
@@ -53,6 +64,49 @@ func requestPermission() {
         } 
     } 
 }
+```
+
+## 개인정보 보호 매니페스트 파일(Privacy manifest file)
+1. **PrivacyInfo.xcprivacy**
+* 2024년 5월 1일부터 특정 API를 사용할 경우 허용된 사유가 포함된 PrivacyInfo.xcprivacy 파일이 프로젝트에 포함되어야 합니다.
+* 터치애드 SDK 산출물내 포함된 PrivacyInfo.xcprivacy에 아래내용을 추가했습니다.
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyCollectedDataType</key>
+            <string>NSPrivacyCollectedDataTypeDeviceID</string>
+            <key>NSPrivacyCollectedDataTypeLinked</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypeTracking</key>
+            <false/>
+            <key>NSPrivacyCollectedDataTypePurposes</key>
+            <array>
+                <string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+            </array>
+        </dict>
+    </array>
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
 ```
 
 ## NH터치애드 플랫폼 public 클래스
@@ -299,13 +353,10 @@ NHEarningMenuViewController* vc = [[NHEarningMenuViewController alloc] initWithI
 ## 빌드시  주의사항
 
 * 애플 앱스토어 혹은 TestFlight 를 통한 앱배포시에는 x86_64 아키텍쳐 빌드가 제외된 SDK 로 빌드하여야 합니다.
-* armv7, arm64  빌드 SDK :  폴더/ios_touchAd_sdk/배포용/TouchadSDK.framework
-* XCode 에뮬레이터를 이용한 앱 개발시에는 x86_64 아키텍쳐 빌드가 포함된 SDK 로 빌드하여야 합니다.
-* armv7, arm64, x86_64 빌드 SDK : 폴더/ios_touchAd_sdk/개발용/TouchadSDK.framework
+* arm64  빌드 SDK :  폴더/ios_touchAd_sdk/배포용/TouchadSDK.framework
 
 ## Sample 프로젝트
 
 * 프로젝트명 : ios_touchAd
 * 위 설명한 모든 내용이 실제 코딩이 되어 있습니다.
 * 실제 SDK 설치 시 참조하면 도움이 될 것입니다.
-
