@@ -23,7 +23,7 @@
 * NH멤버스 버전 NH터치애드 SDK에 대한 설명입니다.
 * NH터치애드 SDK For NH멤버스 앱은 안드로이드 스튜디오(4.2.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
 
 
 
@@ -41,13 +41,13 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
 
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1004
-        versionName "1.4"
+        targetSdkVersion 34
+        versionCode 1005
+        versionName "1.5"
         multiDexEnabled true
 
     }
@@ -255,7 +255,7 @@ dependencies {
 
 * 정상적인 제휴서비스를 위한 NH터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-nh-1.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-nh-1.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -299,7 +299,7 @@ task clean(type: Delete) {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.4’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-nh-1.5’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 apply plugin: 'com.android.application'
@@ -308,14 +308,14 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1004
-        versionName "1.4"
+        targetSdkVersion 34
+        versionCode 1005
+        versionName "1.5"
         multiDexEnabled true
     }
 
@@ -360,7 +360,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.github.bumptech.glide:glide:4.8.0'
 
-    implementation name: 'touchad-sdk-nh-1.4', ext: 'aar'
+    implementation name: 'touchad-sdk-nh-1.5', ext: 'aar'
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
