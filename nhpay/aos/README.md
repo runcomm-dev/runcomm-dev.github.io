@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
 
     }
@@ -356,29 +356,12 @@ private fun checkRequiredPermission() {
 
 
 
-### Foreground Service
-
-* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
-
-* targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
-
-* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
-
-* 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
-
-     ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
-
-
-
-
-
-
 
 #  TouchAd SDK For NH Pay 설치 가이드
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -402,7 +385,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.1’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -419,7 +402,7 @@ android {
         applicationId "NH Pay 패키지 명"
         minSdkVersion 21
         targetSdkVersion 33
-        versionCode 1000
+        versionCode 1001
         versionName "1.0"
         multiDexEnabled true
     }
@@ -470,7 +453,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.0.aar')
+    implementation files('libs/touchad-sdk-1.1.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -501,6 +484,11 @@ object TouchAdPlatform {
 */
 fun  openNHPAYBannerMenu(context: Context, encData: String)
 
+/**
+* 매일매일 교통적립 화면 시작
+*/
+fun openNHPAYApprlNoMenu(context: Context, encData: String)
+
 ~~~
 
 
@@ -524,6 +512,27 @@ String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"
 String encData = encrypt(orgData)
 
 TouchAdPlatform.INSTANCE.openNHPAYBannerMenu(context, encData)
+~~~
+
+## 매일매일 교통적립 화면 시작
+
+*  NH Pay앱 내에서 매일매일 교통적립 메뉴를 선택하면 약관동의 거치고 매일매일 교통적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 매일매일 교통적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYApprlNoMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYApprlNoMenu(context, encData)
 ~~~
 
 ## Sample 프로젝트
