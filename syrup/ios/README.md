@@ -121,6 +121,15 @@ public class TASDKManager: NSObject {
 * @param gender: 성별(남자 : M, 여자 : F, 기타 : Z)
 * @param birthYear: 출생년도(ex : 1996)
 */
+func openTodayEarningMenu(_ isProd : Bool, _ userId : String, _ gender : String?, _ birthYear : String?)
+
+/**
+* 포인트 더받는 미션 화면 시작
+* @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값 (필수, true = 상용 도메인, false = 개발 도메인)
+* @param userId: 고객식별번호 (필수)
+* @param gender: 성별(남자 : M, 여자 : F, 기타 : Z)
+* @param birthYear: 출생년도(ex : 1996)
+*/
 func openEarningMenu(_ isProd : Bool, _ userId : String, _ gender : String?, _ birthYear : String?)
 
 }
@@ -132,6 +141,20 @@ func openEarningMenu(_ isProd : Bool, _ userId : String, _ gender : String?, _ b
 *  Syrup 앱 내 출석체크 화면에서 '꽝없이 3번 랜덤포인트' 버튼을 터치시 호출합니다.
 
 *  아래는 꽝없이 3번 랜덤 포인트 화면 시작함수 예시입니다.
+```
+let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
+let userId : String = "고객식별번호"
+let gender : String = "M"
+let birthYear : String = "1996" 
+
+TASDKManager.openTodayEarningMenu(isProd, userId, gender, birthYear)
+```
+
+## 포인트 더받는 미션 화면 시작
+
+*  Syrup 앱 내 출석체크 화면에서 '포인트 더받는 미션' 버튼을 터치시 호출합니다.
+
+*  아래는 포인트 더받는 미션 화면 시작함수 예시입니다.
 ```
 let isProd : Bool = true(상용 도메인) 또는 false(개발도메인)
 let userId : String = "고객식별번호"
