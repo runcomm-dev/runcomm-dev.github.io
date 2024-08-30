@@ -61,6 +61,12 @@ func openNHPAYBannerMenu(_ encData : String)
 */
 func openNHPAYApprlNoMenu(_ encData : String)
 
+/**
+* 쿠팡 쇼핑 적립 화면 시작 
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+func openNHPAYCoupangShoppingMenu(_ encData : String)
+
 }
 ```
 
@@ -89,14 +95,26 @@ TASDKManager.openNHPAYBannerMenu(encData)
 
 ## 매일매일 교통적립 화면 시작
 
-*  NHPAY앱 내에서 포인트플러스 메뉴를 선택하면 약관동의 거치고 포인트플러스 화면을 시작할때 호출합니다.
+*  NHPAY앱 내에서 매일매일 교통적립 메뉴를 선택하면 약관동의 거치고 매일매일 교통적립 화면을 시작할때 호출합니다.
 
-* 아래는 포인트플러스 화면 시작함수 호출 예시입니다.
+* 아래는 매일매일 교통적립 화면 시작함수 호출 예시입니다.
 ```
 var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
 var encData = encrypt(orgData);
 
 TASDKManager.openNHPAYApprlNoMenu(encData)
+```
+
+## 쿠팡 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 쿠팡 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쿠팡 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쿠팡 쇼핑 적립 화면 시작함수 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+TASDKManager.openNHPAYCoupangShoppingMenu(encData)
 ```
 
 ~~## 2차 푸시 결과 화면 (백그라운드, IOS >= 10)~~
