@@ -22,7 +22,7 @@
 * NH Pay 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For NH Pay 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
 
 
 
@@ -41,13 +41,13 @@ plugins {
 
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1001
-        versionName "1.1"
+        targetSdkVersion 34
+        versionCode 1003
+        versionName "1.3"
         multiDexEnabled true
 
     }
@@ -181,17 +181,11 @@ private fun checkRequiredPermission() {
     <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
     <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
-
-    <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
@@ -221,15 +215,6 @@ private fun checkRequiredPermission() {
         android:hardwareAccelerated="true"
         android:theme="@style/TouchAdTheme"
         android:requestLegacyExternalStorage="true">
-
-        <!--CPI 광고 처리를 위한 서비스 -->
-        <service
-            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE"
-            android:protectionLevel="signature">
-        </service>
 
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
@@ -361,7 +346,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.3.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -385,7 +370,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.1’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.3’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -396,14 +381,14 @@ plugins {
 
 android {
     namespace 'NH Pay 패키지 명"'
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "NH Pay 패키지 명"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1001
-        versionName "1.0"
+        targetSdkVersion 34
+        versionCode 1003
+        versionName "1.3"
         multiDexEnabled true
     }
 
@@ -453,7 +438,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.1.aar')
+    implementation files('libs/touchad-sdk-1.3.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -488,6 +473,11 @@ fun  openNHPAYBannerMenu(context: Context, encData: String)
 * 매일매일 교통적립 화면 시작
 */
 fun openNHPAYApprlNoMenu(context: Context, encData: String)
+
+/**
+* 쿠팡 쇼핑 적립 화면 시작
+*/
+fun openNHPAYCoupangShoppingMenu(context: Context, encData: String)
 
 ~~~
 
@@ -533,6 +523,27 @@ String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"
 String encData = encrypt(orgData)
 
 TouchAdPlatform.INSTANCE.openNHPAYApprlNoMenu(context, encData)
+~~~
+
+## 쿠팡 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 쿠팡 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쿠팡 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 쿠팡 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYCoupangShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYCoupangShoppingMenu(context, encData)
 ~~~
 
 ## Sample 프로젝트
