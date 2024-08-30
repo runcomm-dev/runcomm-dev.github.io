@@ -46,8 +46,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1001
-        versionName "1.1"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
 
     }
@@ -302,7 +302,7 @@ dependencies {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -324,7 +324,7 @@ plugins {
 
 2. **build.gradle(app)파일수정**
     *  아래 dependencies 영역내용을 추가합니다.
-    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.1.aar')를 추가합니다.
+    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.2.aar')를 추가합니다.
     *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -341,8 +341,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1001
-        versionName "1.1"
+        versionCode 1002
+        versionName "1.2"
         multiDexEnabled true
     }
 
@@ -393,7 +393,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
 
-    implementation files('libs/touchad-sdk-1.1.aar')
+    implementation files('libs/touchad-sdk-1.2.aar')
 
     implementation 'androidx.multidex:multidex:2.0.0'
     implementation 'androidx.activity:activity:1.7.0'
@@ -422,6 +422,11 @@ object TouchAdPlatform {
 /**
 * 꽝없이 3번 랜덤 포인트 화면 시작
 */
+fun  openTodayEarningMenu(context: Context, isProd: Boolean, userId: String, gender:String?, birthYear: String?)
+
+/**
+* 포인트 더받는 미션 화면 시작
+*/
 fun  openEarningMenu(context: Context, isProd: Boolean, userId: String, gender:String?, birthYear: String?)
 
 }
@@ -437,6 +442,20 @@ fun  openEarningMenu(context: Context, isProd: Boolean, userId: String, gender:S
 * birthYear = 출생년도(ex : 1996)
 
 * 아래는 꽝없이 3번 랜덤 포인트 화면 시작함수 예시입니다.
+
+~~~
+TouchAdPlatform.openTodayEarningMenu(context, isProd, userId, gender, birthYear)
+~~~
+
+##  포인트 더받는 미션 화면 시작
+
+* Syrup 앱 내 출석체크 화면에서 '포인트 더받는 미션' 버튼을 터치시 호출합니다.
+* isProd = 개발 / 상용 도메인을 설정하는 Boolean 값(필수, true = 상용 도메인, false = 개발 도메인)
+* userId = 고객식별번호(필수)
+* gender = 성별(남자 : M, 여자 : F, 기타 : Z)
+* birthYear = 출생년도(ex : 1996)
+
+* 아래는 포인트 더받는 미션 화면 시작함수 예시입니다.
 
 ~~~
 TouchAdPlatform.openEarningMenu(context, isProd, userId, gender, birthYear)
