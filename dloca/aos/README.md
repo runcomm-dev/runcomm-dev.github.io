@@ -47,8 +47,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
 
     }
@@ -221,14 +221,10 @@ private fun checkRequiredPermission() {
     </queries>
 
     <application
-        android:icon="@mipmap/tc_ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/tc_ic_launcher_round"
         android:supportsRtl="true"
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme"
         android:requestLegacyExternalStorage="true">
 
         <!-- 웹뷰화면 -->
@@ -309,21 +305,11 @@ private fun checkRequiredPermission() {
 }
 ~~~
 
-
-
-### styles.xml 파일
-
-* 쓱쌓은 메인 테마로 AppCompat.Light.NoActionBar를 사용하며 테마 네이밍이 겹치지 않도록 주의합니다.
-
-* Touchad 메인 테마명 : name = TouchAdTheme
-
-
-
 #  Touchad SDK For DIGILOCA 설치 가이드
 
 * 정상적인 제휴서비스를 위한 Touchad SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -344,7 +330,7 @@ plugins {
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.0’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.1’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -358,11 +344,11 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId "DIGILOCA 패키지명"
+        applicationId "kr.co.touchad"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1000
-        versionName "1.0"
+        versionCode 1001
+        versionName "1.1"
         multiDexEnabled true
     }
 
@@ -408,7 +394,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.0.aar')
+    implementation files('libs/touchad-sdk-1.1.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
