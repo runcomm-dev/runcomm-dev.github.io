@@ -22,7 +22,7 @@
 * BC 페이북 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For BC 페이북 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
 
 
 
@@ -34,30 +34,32 @@
 * 아래는 SDK 프로젝트 build.gradle(app)에 실제 적용된 내용입니다.
 
 ~~~
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
 
 android {
-
-    compileSdkVersion 33
+    namespace 'kr.co.touchad.sdk'
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 1005
-        versionName "1.5"
+        targetSdkVersion 34
+        versionCode 1007
+        versionName "1.7"
         multiDexEnabled true
 
     }
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
         debug {
             minifyEnabled false
-            useProguard false
             buildConfigField "boolean", "TraceEnable", "true"
             buildConfigField "boolean", "TraceVerbose", "true"
             buildConfigField "java.util.Date", "buildTime", "new java.util.Date(" +
@@ -76,8 +78,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     lintOptions {
@@ -89,7 +95,7 @@ android {
 }
 
 dependencies {
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0"
     implementation 'androidx.appcompat:appcompat:1.4.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
@@ -191,9 +197,6 @@ private fun checkRequiredPermission() {
     <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
 
-    <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
-
     <!--Android 10(API 29) 이상에서 공용 미디어 파일 접근 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
 
@@ -214,14 +217,10 @@ private fun checkRequiredPermission() {
     </queries>
 
     <application
-        android:icon="@mipmap/tc_ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/tc_ic_launcher_round"
         android:supportsRtl="true"
         android:allowBackup="false"
         android:usesCleartextTraffic="true"
         android:hardwareAccelerated="true"
-        android:theme="@style/TouchAdTheme"
         android:requestLegacyExternalStorage="true">
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
@@ -242,6 +241,28 @@ private fun checkRequiredPermission() {
 * 추가로 retrofit2및 stactrace 오류보고에 대한 난독화 예외도 추가합니다.
 * 아래 코드는 SDK에 추가된 Proguard-rules.pro에 대한 내용입니다.
 ~~~
+# Add project specific ProGuard rules here.
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.
+#
+# For more details, see
+#   http://developer.android.com/guide/developing/tools/proguard.html
+
+# If your project uses WebView with JS, uncomment the following
+# and specify the fully qualified class name to the JavaScript interface
+# class:
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
+
+# Uncomment this to preserve the line number information for
+# debugging stack traces.
+#-keepattributes SourceFile,LineNumberTable
+
+# If you keep the line number information, uncomment this to
+# hide the original source file name.
+#-renamesourcefileattribute SourceFile
+
 -keep class kr.co.touchad.sdk.** {public *;}#패키지 하위 클래스 중 public 메소드만 난독화x
 -keep class android.support.** { *; }
 -keep class com.google.** { *; }
@@ -251,15 +272,36 @@ private fun checkRequiredPermission() {
 -keepattributes SourceFile,LineNumberTable
 
 # retrofit2
--dontwarn okhttp3.**
--dontwarn okio.**
--dontwarn retrofit2.**
--dontnote okhttp3.**
--dontnote retrofit2.Platform
--dontnote retrofit2.Platform$IOS$MainThreadExecutor
--dontwarn retrofit2.Platform$Java8
--keepattributes Signature
--keepattributes Exceptions
+#****gradle plugin version 8.1 and lower
+#-dontwarn okhttp3.**
+#-dontwarn okio.**
+#-dontwarn retrofit2.**
+#-dontnote okhttp3.**
+#-dontnote retrofit2.Platform
+#-dontnote retrofit2.Platform$IOS$MainThreadExecutor
+#-dontwarn retrofit2.Platform$Java8
+#-keepattributes Signature
+#-keepattributes Exceptions
+#****gradle plugin version 8.2 and higher
+-keepattributes Signature, InnerClasses, EnclosingMethod
+-keepattributes RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations
+-keepattributes AnnotationDefault
+-keepclassmembers,allowshrinking,allowobfuscation interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
+-dontwarn javax.annotation.**
+-dontwarn kotlin.Unit
+-dontwarn retrofit2.KotlinExtensions
+-dontwarn retrofit2.KotlinExtensions$*
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface <1>
+-if interface * { @retrofit2.http.* <methods>; }
+-keep,allowobfuscation interface * extends <1>
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+-if interface * { @retrofit2.http.* public *** *(...); }
+-keep,allowoptimization,allowshrinking,allowobfuscation class <3>
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
 
 ##---------------Begin: proguard configuration for Gson  ----------
 # Gson uses generic type information stored in a class file when working with fields. Proguard
@@ -276,12 +318,23 @@ private fun checkRequiredPermission() {
 # Application classes that will be serialized/deserialized over Gson
 -keep class com.google.gson.examples.android.model.** { <fields>; }
 
+##---------------Start: proguard configuration for jwtdecode(gradle plugin version 8.2 and higher)---------
+-dontwarn com.auth0.android.jwt.JWT
+-keep class com.auth0.android.jwt.JWTPayload {
+    <fields>;
+}
+##---------------End: proguard configuration for jwtdecode(gradle plugin version 8.2 and higher)---------
+
 # Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
 # JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
 -keep class * extends com.google.gson.TypeAdapter
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
+
+# Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
 
 # Prevent R8 from leaving Data object members always null
 -keepclassmembers,allowobfuscation class * {
@@ -338,28 +391,11 @@ private fun checkRequiredPermission() {
 ~~~
 
 
-
 ### styles.xml 파일
 
 * 터치애드는 메인 테마로 AppCompat.Light.NoActionBar를 사용하며 테마 네이밍이 겹치지 않도록 주의합니다.
 
 * 터치애드 메인 테마명 : name = TouchAdTheme
-
-
-
-### Foreground Service
-
-* 터치애드는 CPI 광고(Cost Per Install) 설치 체크를 위해 CPI 광고 참여시 background service를 시작합니다.
-
-* targetSdkVersion 26부터 적용되는 background service 실행 제한정책으로 해당 service가 background -> foreground로 변경되었습니다.
-
-* Foreground Service를 시작하기 위해서 앱은 해당 서비스가 백그라운드로 실행되고 있다는것을 사용자에게 알려야하며, 해당 알림은 알림창의 notification 형태로 노출됩니다.
-
-* 터치애드 foreground service 시작시 아래와 같은 notification이 알림창에 노출됩니다.
-
-  ![그리기이(가) 표시된 사진  자동 생성된 설명](https://user-images.githubusercontent.com/25914626/124223205-3f37aa00-db3e-11eb-812f-9c7d4c6ed49d.png)
-
-
 
 
 
@@ -369,66 +405,47 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.7.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
 ## build.gradle 설정
 
 1. **build.gradle(project)파일수정**
-    * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 dependencies의 calsspath에 google-services를 추가합니다.
-    * allprojects안의 repositories에 maven내용을 추가합니다.
+    * 광고Id를 가져와 터치애드 광고참여를 하기 위해 아래 plugins에 google-services를 추가합니다.
     * google-services 사용에 필요한 파일인 google-services.json파일은 샘플 프로젝트 내 gradle 파일과 같은 레벨에서 찾을 수 있습니다.
     * 아래는 실제 작성된 예시입니다.
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-   repositories {
-       google()
-       jcenter()
-   }
-   dependencies {
-       classpath 'com.android.tools.build:gradle:4.0.1'
-       classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.72"
-       classpath 'com.google.gms:google-services:4.2.0'
-       // NOTE: Do not place your application dependencies here; they belong
-       // in the individual module build.gradle files
-   }
-}
-
-allprojects {
-    repositories {
-        maven { url 'https://maven.google.com'}
-
-        jcenter()
-        google()
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
+plugins {
+    id 'com.android.application' version '8.1.4' apply false
+    id 'com.android.library' version '8.1.4' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
+    id 'com.google.gms.google-services' version '4.3.15' apply false
 }
 ~~~
 
 2. **build.gradle(app)파일수정**
     *  아래 dependencies 영역내용을 추가합니다.
-    *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-    *  dependencies 영역에 Implementation name: ’touchad-sdk-1.5’, ext: ’arr’를 추가합니다.
+    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.7.aar')를 추가합니다.
     *  중복된 내용은 생략 합니다.
 ~~~
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'com.google.gms.google-services'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+}
 
 android {
-    compileSdkVersion 33
+    namespace 'kr.co.touchad'
+    compileSdk 34
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 23
-        targetSdkVersion 33
-        versionCode 1005
-        versionName "1.5"
+        targetSdkVersion 34
+        versionCode 1007
+        versionName "1.7"
         multiDexEnabled true
     }
 
@@ -449,8 +466,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
     lintOptions {
@@ -461,14 +482,8 @@ android {
     }
 }
 
-repositories {
-    flatDir{
-        dirs 'libs'
-    }
-}
-
 dependencies {
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72"
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
@@ -476,11 +491,12 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
+    implementation 'com.google.firebase:firebase-messaging:20.2.1'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation name: 'touchad-sdk-1.5', ext: 'aar'
+    implementation files('libs/touchad-sdk-1.7.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
