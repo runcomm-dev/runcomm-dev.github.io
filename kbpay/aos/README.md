@@ -23,7 +23,7 @@
 * KB 버전 쓱쌓 SDK에 대한 설명입니다.
 * 쓱쌓 SDK For KB 리브메이트 앱은 안드로이드 스튜디오(4.0.1)으로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 33, compileSdkVersion : 33 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
 
 
 
@@ -42,13 +42,13 @@ plugins {
 
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1024
-        versionName "2.5"
+        targetSdkVersion 34
+        versionCode 1028
+        versionName "2.8"
         multiDexEnabled true
 
     }
@@ -125,20 +125,13 @@ dependencies {
 ~~~
 private fun checkRequiredPermission() {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE) {
-                startGalleryPage()
-            }
             return
         }
 
         permissionHelper = PermissionHelper(arrayOf(permission), context)
 
         if (permissionHelper!!.checkPermissionInApp()) {
-            if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
-            {
-                startGalleryPage()
-            }
-            else if (permission == Manifest.permission.READ_PHONE_STATE)
+            if (permission == Manifest.permission.READ_PHONE_STATE)
             {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     val canDrawble = Settings.canDrawOverlays(context)
@@ -172,11 +165,7 @@ private fun checkRequiredPermission() {
 
                     if (isGranted)
                     {
-                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
-                        {
-                            startGalleryPage()
-                        }
-                        else if (permission == Manifest.permission.READ_PHONE_STATE)
+                        if (permission == Manifest.permission.READ_PHONE_STATE)
                         {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                                 val canDrawble = Settings.canDrawOverlays(context)
@@ -189,15 +178,6 @@ private fun checkRequiredPermission() {
                     }
                     else
                     {
-                        if (permission == Manifest.permission.READ_EXTERNAL_STORAGE || permission == Manifest.permission.READ_MEDIA_IMAGES)
-                        {
-                            if (touchAdWebView!!.mFilePathCallback != null) {
-                                //파일을 한번 오픈했으면 mFilePathCallback 를 초기화를 해줘야함
-                                // -- 그렇지 않으면 다시 파일 오픈 시 열리지 않는 경우 발생
-                                touchAdWebView!!.mFilePathCallback!!.onReceiveValue(null)
-                                touchAdWebView!!.mFilePathCallback = null
-                            }
-                        }
                         Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -226,15 +206,9 @@ private fun checkRequiredPermission() {
 
     <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!--죽지 않는 서비스를 구현하기 위한 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 	
 	<!--Task 정보를 구하는 권한, 21버전 미만 통화상태 확인하기 위해 사용 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
-
-    <!--Android 10(API 29) 이상에서 전체화면 활동 실행 권한 // 권한 레벨 : 일반-->
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -244,12 +218,6 @@ private fun checkRequiredPermission() {
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <queries>
         <intent>
@@ -268,15 +236,6 @@ private fun checkRequiredPermission() {
         android:hardwareAccelerated="true"
         android:theme="@style/TouchAdTheme"
         android:requestLegacyExternalStorage="true">
-
-        <!--CPI 광고 처리를 위한 서비스 -->
-        <service
-            android:name="kr.co.touchad.sdk.ui.service.TouchAdService"
-            android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.FOREGROUND_SERVICE"
-            android:protectionLevel="signature">
-        </service>
 
         <!-- 웹뷰화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.webview.WebViewActivity"
@@ -370,7 +329,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 쓱쌓 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-2.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.8.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -392,7 +351,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.5’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.8’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -403,14 +362,14 @@ plugins {
 
 android {
     namespace 'kb pay 패키지명'
-    compileSdkVersion 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "kb pay 패키지명"
         minSdkVersion 21
-        targetSdkVersion 33
-        versionCode 1024
-        versionName "1.0"
+        targetSdkVersion 34
+        versionCode 1028
+        versionName "2.8"
         multiDexEnabled true
     }
 
@@ -456,7 +415,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-2.5.aar')
+    implementation files('libs/touchad-sdk-2.8.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -478,6 +437,11 @@ object TouchAdPlatform {
 * 쓱쌓 전면광고 화면 시작
 */
 fun  openKBAdvertise(context: Context, cid: String, data: String)
+
+/**
+* 출첵 플러스 화면 시작
+*/
+fun openKBTodayEarningMenu(context: Context, cid: String)
 
 /**
 * 애드모아 화면 시작
@@ -526,15 +490,25 @@ fun openKBShoppingMenu(context: Context, cid: String, cd: String?)
 val data: String = 
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
 \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
+\"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
 %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 
 TouchAdPlatform.openKBAdvertise(context, cid, data);
 ~~~
 
+##  출첵 플러스 화면 시작
+
+*  KB 앱 내에서 출첵 플러스 메뉴를 선택하면 약관동의를 거치고 출첵 플러스 화면을 시작할때 호출합니다.
+*  cid = 고객관리번호(필수값)
+*  아래는 출첵 플러스 화면 시작함수 호출 예시입니다.
+
+~~~
+TouchAdPlatform.openKBTodayEarningMenu(context, cid)
+~~~
+
 ##  애드모아 화면 시작
 
-*  KB 앱 내에서 참여적립 메뉴를 선택하면 약관동의를 거치고 애드모아 화면을 시작할때 호출합니다.
+*  KB 앱 내에서 애드모아 메뉴를 선택하면 약관동의를 거치고 애드모아 화면을 시작할때 호출합니다.
 *  cid = 고객관리번호(필수값)
 *  아래는 애드모아 화면 시작함수 호출 예시입니다.
 
@@ -619,7 +593,7 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
 ~~~
 "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
  \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
- \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
+ \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
  %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
 ~~~
 
@@ -634,7 +608,7 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
       "touchad": 
          "{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
           \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
+          \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
           %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     }
   },
@@ -654,11 +628,11 @@ TouchAdPlatform.openKBShoppingMenu(Context, cid, cd(외부관리코드))
       "touchad": 
 		"{\"cid\":\"cd834b16c772a0755d133dd1322f2bc24e079f7b9640e71b064bf71fa55e7739\",
          \"apprlNo\":\"12345678\",\"title\":\"LiivMate\",\"body\":\"쓱쌓에서 포인트가 도착했습니다.\",
-         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2f2.ta.runcomm.co.kr
+         \"custom-type\":\"touchad\",\"custom-body\":\"%7b%22touchad%22%3a%22touchad%3a%2f%2ft.ta.runcomm.co.kr
          %2fsrv%2fadvertise%2fmobile%2fselect%2fkb%3fapprlNo%3d12345678%26cid%3d5a8d5abda44de97f7e0742f311f94b92da1813d1c51d1895adc73fea3c01d3d8%26adsIdx%3d15484%22%7d\"}"
     },
     "fcm_options": {
-      "image": "https://2.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
