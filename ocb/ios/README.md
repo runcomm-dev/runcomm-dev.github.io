@@ -5,7 +5,7 @@
 * 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* Xcode 15.3 Build, Minimum Deployment 14.0 입니다.
+* Xcode 16.2 Build, Minimum Deployment 14.0 입니다.
 
 
 ## CocoaPods 설정
@@ -122,7 +122,7 @@ func requestPermission() {
 @objc public class OCBTodayEarningMenuViewController: UINavigationController
 
 /**
-* 포인트 더받는 미션 화면 시작
+* 포인트 더받기 미션 화면 시작
 * @param isProd: 개발 / 상용 도메인을 설정하는 Bool 값 (필수, true = 상용 도메인, false = 개발 도메인)
 * @param userId: 고객식별번호 (필수)
 * @param gender: 성별(남자 : M, 여자 : F, 기타 : Z)
