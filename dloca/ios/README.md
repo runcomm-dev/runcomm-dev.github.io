@@ -5,7 +5,7 @@
 * 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework, Alamofire.xcframework 폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* Xcode 15.3 Build, Minimum Deployment 14.0 입니다.
+* Xcode 16.1 Build, Minimum Deployment 14.0 입니다.
 
 
 ## CocoaPods 설정
@@ -96,7 +96,7 @@ func requestPermission() {
 * @param gender: 회원 성별(ex: 남성 = M, 여성 = F)
 * @param birthYear: 회원 출생년도(ex: 1992)
 */
-func openTodayEarningMenu(isProd: Bool, isModal: Bool = false, cid: String, gender: String?, birthYear: String?)
+func openTodayEarningMenu(isProd: Bool, isModal: Bool = false, cid: String, gender: String, birthYear: String)
 
 /**
 * 라방보고머니
@@ -106,7 +106,7 @@ func openTodayEarningMenu(isProd: Bool, isModal: Bool = false, cid: String, gend
 * @param gender: 회원 성별(ex: 남성 = M, 여성 = F)
 * @param birthYear: 회원 출생년도(ex: 1992)
 */
-func openLabangEarningMenu(isProd: Bool, isModal: Bool = false, cid: String, gender: String?, birthYear: String?)
+func openLabangEarningMenu(isProd: Bool, isModal: Bool = false, cid: String, gender: String, birthYear: String)
 
 ```
 
