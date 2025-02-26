@@ -5,7 +5,7 @@
 * 제공한 TouchadSDK.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* Xcode 15.2 Build, Minimum Deployment 14.0 입니다.
+* Xcode 16.2 Build, Minimum Deployment 14.0 입니다.
 
 
 ## CocoaPods 설정
