@@ -21,7 +21,7 @@
 * OCB 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For OCB 앱은 안드로이드 스튜디오(Hedgehog)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 26 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 26 , targetSdkVersion : 35, compileSdkVersion : 35 (으)로 빌드되었습니다.
 
 
 
@@ -40,13 +40,13 @@ plugins {
 }
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 26
-        targetSdkVersion 34
-        versionCode 1003
-        versionName "1.3"
+        targetSdkVersion 35
+        versionCode 1004
+        versionName "1.4"
         multiDexEnabled true
 
     }
@@ -297,7 +297,7 @@ dependencies {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.3.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -319,7 +319,8 @@ plugins {
 
 2. **build.gradle(app)파일수정**
     *  아래 dependencies 영역내용을 추가합니다.
-    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.3.aar')를 추가합니다.               *  중복된 내용은 생략 합니다.
+    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.4.aar')를 추가합니다.
+    *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
     id 'com.android.application'
@@ -329,14 +330,14 @@ plugins {
 
 android {
     namespace 'kr.co.touchad'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 26
-        targetSdkVersion 34
-        versionCode 1003
-        versionName "1.3"
+        targetSdkVersion 35
+        versionCode 1004
+        versionName "1.4"
         multiDexEnabled true
     }
 
@@ -388,7 +389,7 @@ dependencies {
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
 
-    implementation files('libs/touchad-sdk-1.3.aar')
+    implementation files('libs/touchad-sdk-1.4.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'androidx.multidex:multidex:2.0.0'
