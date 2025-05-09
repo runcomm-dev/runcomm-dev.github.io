@@ -47,8 +47,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1002
-        versionName "1.2"
+        versionCode 1004
+        versionName "1.4"
         multiDexEnabled true
 
     }
@@ -117,11 +117,9 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
 * 전화관련 정보 읽기 권한인 READ_PHONE_STATE는 API LEVEL 29까지만 적용되어 API LEVEL 30 부터 전면광고 화면에서 전화상태 체크를 하지 않습니다.
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
-* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20231103 업데이트)
 * 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
 ~~~
 private fun checkRequiredPermission() {
@@ -206,12 +204,6 @@ private fun checkRequiredPermission() {
 
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <queries>
         <intent>
@@ -309,7 +301,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 Touchad SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.2.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -347,8 +339,8 @@ android {
         applicationId "DIGILOCA 패키지명"
         minSdkVersion 23
         targetSdkVersion 34
-        versionCode 1002
-        versionName "1.2"
+        versionCode 1004
+        versionName "1.4"
         multiDexEnabled true
     }
 
@@ -394,7 +386,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.2.aar')
+    implementation files('libs/touchad-sdk-1.4.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
