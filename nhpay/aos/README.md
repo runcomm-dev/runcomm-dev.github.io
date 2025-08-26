@@ -22,7 +22,7 @@
 * NH Pay 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For NH Pay 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 35, compileSdkVersion : 35 (으)로 빌드되었습니다.
 
 
 
@@ -40,13 +40,13 @@ plugins {
 }
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 34
-        versionCode 1004
-        versionName "1.4"
+        targetSdkVersion 35
+        versionCode 1006
+        versionName "1.6"
         multiDexEnabled true
 
     }
@@ -98,8 +98,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
@@ -222,12 +223,14 @@ private fun checkRequiredPermission() {
             android:theme="@style/TouchAdTheme"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
 
         <!-- 전체 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
             android:theme="@style/TouchAdTheme"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
     </application>
@@ -407,7 +410,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.4.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.6.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -431,7 +434,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.4’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.6’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -442,14 +445,14 @@ plugins {
 
 android {
     namespace 'kr.co.touchad'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 21
-        targetSdkVersion 34
-        versionCode 1004
-        versionName "1.4"
+        targetSdkVersion 35
+        versionCode 1006
+        versionName "1.6"
         multiDexEnabled true
     }
 
@@ -492,15 +495,16 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.12.13'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.4.aar')
+    implementation files('libs/touchad-sdk-1.6.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -537,9 +541,9 @@ fun  openNHPAYBannerMenu(context: Context, encData: String)
 fun openNHPAYApprlNoMenu(context: Context, encData: String)
 
 /**
-* 쿠팡 쇼핑 적립 화면 시작
+* 쇼핑 적립 화면 시작
 */
-fun openNHPAYCoupangShoppingMenu(context: Context, encData: String)
+fun openNHPAYShoppingMenu(context: Context, encData: String)
 
 ~~~
 
@@ -587,25 +591,25 @@ String encData = encrypt(orgData)
 TouchAdPlatform.INSTANCE.openNHPAYApprlNoMenu(context, encData)
 ~~~
 
-## 쿠팡 쇼핑 적립 화면 시작
+## 쇼핑 적립 화면 시작
 
-*  NH Pay앱 내에서 쿠팡 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쿠팡 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  NH Pay앱 내에서 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할 때 호출합니다.
 *  encData = 암호화된 사용자 정보(필수)
 
-*  아래는 쿠팡 쇼핑 적립 시작함수 호출 예시입니다.
+*  아래는 쇼핑 적립 시작함수 호출 예시입니다.
 
 ~~~
 <코틀린>
 val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
 val encData = encrypt(orgData)
 
-TouchAdPlatform.openNHPAYCoupangShoppingMenu(context, encData)
+TouchAdPlatform.openNHPAYShoppingMenu(context, encData)
 
 <자바>
 String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
 String encData = encrypt(orgData)
 
-TouchAdPlatform.INSTANCE.openNHPAYCoupangShoppingMenu(context, encData)
+TouchAdPlatform.INSTANCE.openNHPAYShoppingMenu(context, encData)
 ~~~
 
 ## Sample 프로젝트
