@@ -45,8 +45,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 1006
-        versionName "1.6"
+        versionCode 1007
+        versionName "1.7"
         multiDexEnabled true
 
     }
@@ -114,65 +114,13 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 WRITE_EXTERNAL_STORAGE와 같이 **위험 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
-    **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
-* 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
-* Android 13 부터 저장소 권한 세분화 정책이 적용되어 이미지 읽기를 사용할 경우 READ_EXTERNAL_STORAGE 대신 READ_MEDIA_IMAGES를 사용해야 합니다.(20221230 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
-* 아래는 소스코드 레벨에서 권한을 설정한 내용으로 위험, 특별 권한 레벨 설정 예시입니다.
-~~~
-private fun checkRequiredPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return
-        }
-        permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
-        if (permissionHelper!!.checkPermissionInApp()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val canDrawable = Settings.canDrawOverlays(context)
-                if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
-                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                    startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                }
-            }
-            return
-        }
-        permissionHelper!!.requestPermission(0, object : PermissionHelper.PermissionCallback {
-
-            override fun onPermissionResult(permissions: Array<String>, grantResults: IntArray?) {
-                mPermissions = permissions as Array<String?>
-                mGrantResults = grantResults
-                if (grantResults!!.isNotEmpty()) {
-                    for (i in grantResults.indices) {
-                        if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
-                            Toast.makeText(applicationContext, "모든 권한을 수락하셔야 기능을 사용하실 수 있습니다.", Toast.LENGTH_LONG).show()
-                            break
-                        }
-                    }
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    val canDrawable = Settings.canDrawOverlays(context)
-                    if (!canDrawable && permissionHelper!!.checkPermissionInApp()) {
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, REQ_CODE_OVERLAY_PERMISSION)
-                    }
-                }
-            }
-        })
-    }
-~~~
-
-
-
-
 * 참조용으로 SDK 내에 설정된 내용입니다.
 ~~~
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="kr.co.touchad.sdk">
-
-    <!--20240315 LeeYP 진동 권한 코드 삭제-->
 
     <!--인터넷 접속(네트워크 작업)을 위한 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -183,22 +131,11 @@ private fun checkRequiredPermission() {
     <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
     <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
 
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-
     <!--광고아이디 얻기 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-
-    <!--저장소 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
-    <!--안드로이드 13 이상부터 저장소 권한 세분화로 이미지 읽기를 할 때 사용하는 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <queries>
         <intent>
@@ -410,7 +347,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.6.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-1.7.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -434,7 +371,7 @@ plugins {
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.6’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.7’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -451,8 +388,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 1006
-        versionName "1.6"
+        versionCode 1007
+        versionName "1.7"
         multiDexEnabled true
     }
 
@@ -504,7 +441,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.6.aar')
+    implementation files('libs/touchad-sdk-1.7.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
