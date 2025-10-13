@@ -48,8 +48,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 35
-        versionCode 1043
-        versionName "3.5"
+        versionCode 1045
+        versionName "3.7"
         multiDexEnabled true
 
     }
@@ -246,12 +246,14 @@ private fun checkRequiredPermission() {
             android:theme="@style/TouchAdTheme"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
 
         <!-- 전체 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
             android:theme="@style/TouchAdTheme"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
 
@@ -259,6 +261,7 @@ private fun checkRequiredPermission() {
         <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
             android:theme="@style/TouchAdTheme"
             android:windowSoftInputMode="stateVisible"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
 
@@ -436,7 +439,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-3.5.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-3.7.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -458,7 +461,7 @@ plugins {
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-3.5’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-3.7’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -475,8 +478,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 17
         targetSdkVersion 35
-        versionCode 1043
-        versionName "3.5"
+        versionCode 1045
+        versionName "3.7"
         multiDexEnabled true
     }
 
@@ -528,7 +531,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-3.5.aar')
+    implementation files('libs/touchad-sdk-3.7.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
@@ -687,7 +690,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
 * Public API를 개발하신 후 광고 SDK 담당자에게 전달바랍니다.
 * 요청 데이터 형식(key : touchad, value : 문자열)
 ~~~
-%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D
+%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D
 ~~~
 
 * API를 통해 POST된 데이터를 FCM 데이터의 구성요소 중 data 프로퍼티에 담아서 FCM 전송 바랍니다. (* 변경 가능성 있습니다.)
@@ -699,7 +702,7 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
     "priority": "high",
     "data": {
       "touchad": 
-         "touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
+         "touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     }
   },
   "apns": {
@@ -716,10 +719,10 @@ TouchAdPlatform.openMPBanner(context, mbrId, adPushYn, gender, birthYear)
         "category": "EVENT_INVITATION"
       },
       "touchad": 
-		"touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
+		"touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB"
     },
     "fcm_options": {
-      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
