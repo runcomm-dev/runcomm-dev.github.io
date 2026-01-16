@@ -13,7 +13,7 @@
 * 프로젝트 Podfile 에 아래내용을 추가합니다.
 ```
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '13.0'
+platform :ios, '15.0'
 use_frameworks!
 
 target 'TouchadSDK' do
@@ -28,7 +28,7 @@ post_install do |installer|
     installer.pods_project.targets.each do |target|
         target.build_configurations.each do |config|
             config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
         end
     end
 end
@@ -118,8 +118,8 @@ public class TASDKManager: NSObject {
 * 참여적립 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
-* @param gender: MP 멤버십회원 성별 M(남),F(여),Z(기타) (필수)
-* @param birthYear: MP 멤버십회원 출생년도 YYYY 4자리 (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 */
 func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
@@ -127,8 +127,8 @@ func openMPEarningMenu(_ mbrId : String, adPushYn : String, gender : String, bir
 * 돈 버는 교통 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
-* @param gender: MP 멤버십회원 성별 M(남),F(여),Z(기타) (필수)
-* @param birthYear: MP 멤버십회원 출생년도 YYYY 4자리 (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 * @param callback: MP 설정화면 오픈함수 (옵션)
 */
 func openMPTouchadMenu(_ mbrId : String, adPushYn : String, gender : String, birthYear : String, callback: (() -> Void)?)
@@ -151,8 +151,8 @@ func openMPEarningResult(_ mbrId : String, userInfo: [AnyHashable : Any])
 * 오늘의 적립 배너 화면 시작
 * @param mbrId: MP 멤버십카드번호 (필수)
 * @param adPushYn: MP 광고푸시수신여부 Y,N (필수)
-* @param gender: MP 멤버십회원 성별 M(남),F(여),Z(기타) (필수)
-* @param birthYear: MP 멤버십회원 출생년도 YYYY 4자리 (필수)
+* @param gender: MP 멤버십회원 성별 1(남),2(여),3(2000년이후 남),4(2000년이후 여) (필수)
+* @param birthYear: MP 멤버십회원 생년월일 YYMMDD 6자리 (필수)
 */
 func openMPBanner(_ mbrId : String, adPushYn : String, gender : String, birthYear : String)
 
@@ -218,7 +218,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 
 * 아래는 참여적립 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "M", birthYear: "1989")
+TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
 ```
 
 ## 돈 버는 교통 화면 시작
@@ -229,7 +229,7 @@ TASDKManager.openMPEarningMenu("멤버십카드번호",adPushYn:"Y", gender: "M"
 
 *  아래는 돈 버는 교통 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "M", birthYear: "1989", callback:{() in 
+TASDKManager.openMPTouchadMenu("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915", callback:{() in 
  //MP 앱내 광고푸시 설정화면 오픈
 })
 ```
@@ -290,7 +290,7 @@ private func application(application: UIApplication, didReceiveRemoteNotificatio
 
 * 아래는 오늘의 적립 배너 화면 시작함수 호출 예시입니다.
 ```
-TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "M", birthYear: "1989")
+TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "2", birthYear: "010915")
 ```
 
 
@@ -316,7 +316,7 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "M", bir
   "android": {
     "priority": "high",
     "data": {
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     }
   },
   "apns": {
@@ -332,10 +332,10 @@ TASDKManager.openMPBanner("멤버십카드번호",adPushYn:"Y", gender: "M", bir
         },
         "category": "EVENT_INVITATION"
       },
-      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Fta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
+      "touchad": "%7B%22touchad%22%3A%22touchad%3A%2F%2Ft.ta.runcomm.co.kr%2Fsrv%2Fadvertise%2Fmobile%2Fselect%2Fskt%3FonOff%3D1%26cd%3D125%26cardIdx%3D1565%26areaCd%3DBSUB%22%7D"
     },
     "fcm_options": {
-      "image": "https://ta.runcomm.co.kr/html/img/profile00.png"
+      "image": "https://t.ta.runcomm.co.kr/html/img/profile00.png"
     }
   },
   "tokens": [
