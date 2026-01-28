@@ -22,7 +22,7 @@
 * BC 페이북 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For BC 페이북 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 34, compileSdkVersion : 34 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 23 , targetSdkVersion : 35, compileSdkVersion : 35 (으)로 빌드되었습니다.
 
 
 
@@ -41,13 +41,13 @@ plugins {
 
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion 34
-        versionCode 1008
-        versionName "1.8"
+        targetSdkVersion 35
+        versionCode 1010
+        versionName "2.0"
         multiDexEnabled true
 
     }
@@ -212,6 +212,7 @@ private fun checkRequiredPermission() {
             android:theme="@style/TouchAdTheme"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
     </application>
@@ -390,7 +391,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.8.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -403,16 +404,16 @@ private fun checkRequiredPermission() {
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '8.1.4' apply false
-    id 'com.android.library' version '8.1.4' apply false
-    id 'org.jetbrains.kotlin.android' version '1.9.0' apply false
+    id 'com.android.application' version '8.5.1' apply false
+    id 'com.android.library' version '8.5.1' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.10' apply false
     id 'com.google.gms.google-services' version '4.3.15' apply false
 }
 ~~~
 
 2. **build.gradle(app)파일수정**
     *  아래 dependencies 영역내용을 추가합니다.
-    *  dependencies 영역에 implementation files('libs/touchad-sdk-1.8.aar')를 추가합니다.
+    *  dependencies 영역에 implementation files('libs/touchad-sdk-2.0.aar')를 추가합니다.
     *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -423,14 +424,14 @@ plugins {
 
 android {
     namespace 'kr.co.touchad'
-    compileSdk 34
+    compileSdk 35
 
     defaultConfig {
         applicationId "kr.co.touchad"
         minSdkVersion 23
-        targetSdkVersion 34
-        versionCode 1008
-        versionName "1.8"
+        targetSdkVersion 35
+        versionCode 1009
+        versionName "1.9"
         multiDexEnabled true
     }
 
@@ -481,7 +482,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.8.aar')
+    implementation files('libs/touchad-sdk-2.0.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
