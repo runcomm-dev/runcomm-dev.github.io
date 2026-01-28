@@ -20,7 +20,7 @@ https://github.com/runcomm/ios_TouchAd_spm.git
 
 Dependency Rule : Exact Version 
 
-Version : 0.0.11
+Version : 0.0.12
 
 Add to Project : BC앱프로젝트
 ```
@@ -39,7 +39,7 @@ Add to Project : BC앱프로젝트
 2. **Package Dependencies 확인**
 * 프로젝트 > Package Dependencies 메뉴 > Package 확인
 ```
-TouchadSDK 0.0.11
+TouchadSDK 0.0.12
 
 Alamofire 5.9.0
 ```
