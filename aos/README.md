@@ -48,8 +48,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 1047
-        versionName "3.9"
+        versionCode 1049
+        versionName "4.1"
         multiDexEnabled true
 
     }
@@ -118,9 +118,6 @@ dependencies {
 
 * SDK 내부에 사용되는 resource 아이디는 APK와 충돌하지 않게 네이밍 합니다.
 * 아래에 권한설정 내용에 주석으로 권한 내용과 권한레벨을 작성하였으니 참고하시면 됩니다.
-* 권한 내용 중 CAMERA, WRITE_EXTERNAL_STORAGE, SYSTEM_ALERT_WINDOW와 같이 **위험, 특별권한 런타임 레벨**은 터치애드 메인 화면에 진입하는 액티비티에서 checkRequiredPermission() 함수를 통해 카메라, 외장메모리사용, 다른 앱 위에 그리기 권한을 요청합니다. 
-    **사용자**가 모두 수락할 경우 앱의 모든 기능이 정상적으로 동작하며, 권한을 거부할 경우 해당권한이 필요한 기능이 동작하지 않습니다.
-* 권한 내용 중 **위험 레벨 권한**인 READ_EXTERNAL_STORAGE는 적립문의 화면 내에서 사용하는 파일첨부 기능을 사용하기 위해 추가되었습니다.(20220311 업데이트)
 * Android 13 부터 알림 권한인 POST_NOTIFICATIONS(위험 레벨 권한) 를 선언해야 Push 알림을 받을 수 있기 때문에 이 권한을 사용해야 합니다.(20230428 업데이트)
 * Android 12 업데이트 이후 구글 스토어 정책 변경으로 광고아이디 권한이 추가되었습니다. 아래 상세내용 주소를 첨부합니다.
 * 광고아이디 권한 상세 내용 : https://developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info
@@ -130,7 +127,7 @@ private fun checkRequiredPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return
         }
-        permissionHelper = PermissionHelper(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA), context)
+        permissionHelper = PermissionHelper(arrayOf(Manifest.permission.POST_NOTIFICATIONS), context)
         if (permissionHelper!!.checkPermissionInApp()) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val canDrawable = Settings.canDrawOverlays(context)
@@ -188,9 +185,6 @@ private fun checkRequiredPermission() {
     <!--어플리케이션이 항상 켜져있도록 하는 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
-    <!--외장메모리 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
     <!--Task 정보를 구하는 권한 // 권한레벨 : signatureOrSystem-->
     <uses-permission android:name="android.permission.GET_TASKS"/>
 
@@ -202,19 +196,11 @@ private fun checkRequiredPermission() {
     <!--다른 앱 위에 그리기 권한 // 권한 레벨 : 특별-->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-
     <!--진동 사용 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name = "android.permission.VIBRATE"/>
 
-    <!--전화관련 정보 읽기 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-
     <!--광고아이디 권한 // 권한 레벨 : 일반-->
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
-    
-    <!--저장소 사용 권한 // 권한 레벨 : 위험-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     
     <!--안드로이드 13 이상부터 사용하는 알림 권한 // 권한 레벨 : 위험-->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -249,6 +235,7 @@ private fun checkRequiredPermission() {
         <!-- 전체 광고 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.advertise.AdFullActivity"
             android:theme="@style/TouchAdTheme"
+            android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
         </activity>
@@ -256,6 +243,7 @@ private fun checkRequiredPermission() {
         <!-- 카드등록 화면 -->
         <activity android:name="kr.co.touchad.sdk.ui.activity.card.CardRegisterActivity"
             android:theme="@style/TouchAdTheme"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateVisible"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
             android:exported="false">
@@ -435,7 +423,7 @@ private fun checkRequiredPermission() {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-3.9.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-4.1.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -457,7 +445,7 @@ plugins {
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-3.9’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-4.1’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -474,8 +462,8 @@ android {
         applicationId "kr.co.touchad"
         minSdkVersion 24
         targetSdkVersion 36
-        versionCode 1047
-        versionName "3.9"
+        versionCode 1049
+        versionName "4.1"
         multiDexEnabled true
     }
 
@@ -527,7 +515,7 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-3.9.aar')
+    implementation files('libs/touchad-sdk-4.1.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
