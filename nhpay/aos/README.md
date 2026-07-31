@@ -22,7 +22,7 @@
 * NH Pay 버전 터치애드 SDK에 대한 설명입니다.
 * 터치애드 SDK For NH Pay 앱은 안드로이드 스튜디오(Flamingo)로 개발되었습니다.
 * SDK 결과물은 확장자 aar 형태로 별도 제공됩니다.
-* 안드로이드 minSdkVersion : 21 , targetSdkVersion : 35, compileSdkVersion : 35 (으)로 빌드되었습니다.
+* 안드로이드 minSdkVersion : 24 , targetSdkVersion : 36, compileSdkVersion : 36 (으)로 빌드되었습니다.
 
 
 
@@ -38,15 +38,16 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
+
 android {
     namespace 'kr.co.touchad.sdk'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 35
-        versionCode 1007
-        versionName "1.7"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode 1010
+        versionName "2.0"
         multiDexEnabled true
 
     }
@@ -92,9 +93,10 @@ android {
         abortOnError false
     }
 }
+
 dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.25"
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
@@ -105,6 +107,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.4.3'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
+    implementation 'androidx.activity:activity-ktx:1.9.3'
 }
 ~~~
 
@@ -347,7 +350,7 @@ dependencies {
 
 * 정상적인 제휴서비스를 위한 터치애드 SDK 설치과정을 설명합니다.
 * 샘플 프로젝트를 참조하면 좀 더 쉽게 설치 가능합니다.
-* 제공한 **touchad-sdk-1.7.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
+* 제공한 **touchad-sdk-2.0.aar** 파일을 프로젝트의 libs 폴더에 넣어줍니다.
 
 
 
@@ -361,17 +364,17 @@ dependencies {
 ~~~
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '8.2.2' apply false
-    id 'com.android.library' version '8.2.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.9.25' apply false
-    id 'com.google.gms.google-services' version '4.3.8' apply false
+    id 'com.android.application' version '8.13.2' apply false
+    id 'com.android.library' version '8.13.2' apply false
+    id 'org.jetbrains.kotlin.android' version '2.3.0' apply false
+    id 'com.google.gms.google-services' version '4.4.2' apply false
 }
 ~~~
 
   2. **build.gradle(app)파일수정**
      *  아래 dependencies 영역내용을 추가합니다.
      *  build.gradle에  android{…}영역과 dependencies{…}사이에 repositories{flatDir{…}}을 추가합니다.
-     *  dependencies 영역에 Implementation name: ’touchad-sdk-1.7’, ext: ’arr’를 추가합니다.
+     *  dependencies 영역에 Implementation name: ’touchad-sdk-2.0’, ext: ’arr’를 추가합니다.
      *  중복된 내용은 생략 합니다.
 ~~~
 plugins {
@@ -382,15 +385,16 @@ plugins {
 
 android {
     namespace 'kr.co.touchad'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "kr.co.touchad"
-        minSdkVersion 21
-        targetSdkVersion 35
-        versionCode 1007
-        versionName "1.7"
+        minSdkVersion 24
+        targetSdkVersion 36
+        versionCode 1010
+        versionName "2.0"
         multiDexEnabled true
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildFeatures {
@@ -429,7 +433,7 @@ android {
 
 dependencies {
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.25"
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -441,11 +445,12 @@ dependencies {
     implementation "androidx.viewpager2:viewpager2:1.0.0"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
-    implementation files('libs/touchad-sdk-1.7.aar')
+    implementation files('libs/touchad-sdk-2.0.aar')
 
     implementation 'com.makeramen:roundedimageview:2.3.0'
     implementation 'com.auth0.android:jwtdecode:2.0.0'
     implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'androidx.activity:activity-ktx:1.9.3'
 }
 ~~~
 
@@ -481,6 +486,31 @@ fun openNHPAYApprlNoMenu(context: Context, encData: String)
 * 쇼핑 적립 화면 시작
 */
 fun openNHPAYShoppingMenu(context: Context, encData: String)
+
+/**
+* 쿠팡 쇼핑 적립 화면 시작
+*/
+fun openNHPAYCoupangShoppingMenu(context: Context, encData: String)
+
+/**
+* G 마켓 쇼핑 적립 화면 시작
+*/
+fun openNHPAYGMarketShoppingMenu(context: Context, encData: String)
+
+/**
+* 마켓컬리 쇼핑 적립 화면 시작
+*/
+fun openNHPAYKurlyShoppingMenu(context: Context, encData: String)
+
+/**
+* SSG.COM 쇼핑 적립 화면 시작
+*/
+fun openNHPAYSSGShoppingMenu(context: Context, encData: String)
+
+/**
+* 이마트몰 쇼핑 적립 화면 시작
+*/
+fun openNHPAYEMartShoppingMenu(context: Context, encData: String)
 
 ~~~
 
@@ -547,6 +577,111 @@ String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"
 String encData = encrypt(orgData)
 
 TouchAdPlatform.INSTANCE.openNHPAYShoppingMenu(context, encData)
+~~~
+
+## 쿠팡 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 쿠팡 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쿠팡 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 쿠팡 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYCoupangShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYCoupangShoppingMenu(context, encData)
+~~~
+
+## G 마켓 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 G 마켓 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 G 마켓 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 G 마켓 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYGMarketShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYGMarketShoppingMenu(context, encData)
+~~~
+
+## 마켓컬리 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 마켓컬리 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 마켓컬리 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 마켓컬리 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYKurlyShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYKurlyShoppingMenu(context, encData)
+~~~
+
+## SSG.COM 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 SSG.COM 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 SSG.COM 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 SSG.COM 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYSSGShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYSSGShoppingMenu(context, encData)
+~~~
+
+## 이마트몰 쇼핑 적립 화면 시작
+
+*  NH Pay앱 내에서 이마트몰 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 이마트몰 쇼핑 적립 화면을 시작할 때 호출합니다.
+*  encData = 암호화된 사용자 정보(필수)
+
+*  아래는 이마트몰 쇼핑 적립 시작함수 호출 예시입니다.
+
+~~~
+<코틀린>
+val orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+val encData = encrypt(orgData)
+
+TouchAdPlatform.openNHPAYEMartShoppingMenu(context, encData)
+
+<자바>
+String orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}"
+String encData = encrypt(orgData)
+
+TouchAdPlatform.INSTANCE.openNHPAYEMartShoppingMenu(context, encData)
 ~~~
 
 ## Sample 프로젝트
