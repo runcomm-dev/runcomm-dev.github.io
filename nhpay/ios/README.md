@@ -5,9 +5,9 @@
 * 제공한 TouchadSDK.xcframework, Alamofire.xcframework 폴더를 프로젝트 소스폴더내 적절히 위치시켜 줍니다.
 * 앱프로젝트 target > general > Frameworks,Libraries, and Embedded Content 에서 add files 에서 TouchadSDK.xcframework, Alamofire.xcframework폴더를 선택합니다.
 * Frameworks,Libraries, and Embedded Content 메뉴에서 TouchadSDK.xcframework, Alamofire.xcframework의 Embed 옵션을 ‘Embed & Sign’ 선택합니다.
-* Alamofire.xcframework version 5.9.1 입니다.
-* XCode 16.0 Build, Minimum Deployment 15.0 입니다.
-
+* Alamofire.xcframework version 5.11.2 입니다.
+* XCode 26.2 Build, Minimum Deployment 15.0 입니다.
+    
 
 ## CocoaPods 설정
 * NHPAY IOS앱은 CocoaPods를 사용하지 않습니다.
@@ -63,6 +63,36 @@ func requestPermission() {
 * @param encData: 암호화된 사용자정보 (필수)
 */
 @objc public class NHPAYShoppingViewContoroller: UINavigationController
+
+/**
+* 쿠팡 쇼핑 적립 ViewController
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+@objc public class NHPAYCoupangShoppingViewContoroller: UINavigationController
+
+/**
+* G 마켓 쇼핑 적립 ViewController
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+@objc public class NHPAYGMarketShoppingViewController: UINavigationController
+
+/**
+* 마켓컬리 쇼핑 적립 ViewController
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+@objc public class NHPAYKurlyShoppingViewController: UINavigationController
+
+/**
+* SSG.COM 쇼핑 적립 ViewController
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+@objc public class NHPAYSSGShoppingViewController: UINavigationController
+
+/**
+* 이마트몰 쇼핑 적립 ViewController
+* @param encData: 암호화된 사용자정보 (필수)
+*/
+@objc public class NHPAYEMartShoppingViewController: UINavigationController
 ```
 
 ## 포인트플러스 화면 시작
@@ -101,6 +131,71 @@ var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
 var encData = encrypt(orgData);
 
 let navController = NHPAYShoppingViewContoroller(encData: encData)
+self.present(navController, animated:true, completion: nil)
+```
+
+## 쿠팡 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 쿠팡 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쇼핑 적립 ViewController 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+let navController = NHPAYCoupangShoppingViewContoroller(encData: encData)
+self.present(navController, animated:true, completion: nil)
+```
+
+## G 마켓 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 G 마켓 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쇼핑 적립 ViewController 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+let navController = NHPAYGMarketShoppingViewController(encData: encData)
+self.present(navController, animated:true, completion: nil)
+```
+
+## 마켓컬리 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 마켓컬리 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쇼핑 적립 ViewController 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+let navController = NHPAYKurlyShoppingViewController(encData: encData)
+self.present(navController, animated:true, completion: nil)
+```
+
+## SSG.COM 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 SSG.COM 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쇼핑 적립 ViewController 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+let navController = NHPAYSSGShoppingViewController(encData: encData)
+self.present(navController, animated:true, completion: nil)
+```
+
+## 이마트몰 쇼핑 적립 화면 시작
+
+*  NHPAY앱 내에서 이마트몰 쇼핑 적립 메뉴를 선택하면 약관동의 거치고 쇼핑 적립 화면을 시작할때 호출합니다.
+
+* 아래는 쇼핑 적립 ViewController 호출 예시입니다.
+```
+var orgData = "{\"cid\"=\"123456789\",\"gender\"=\"M\",\"birthYear\"=\"1999\"}";
+var encData = encrypt(orgData);
+
+let navController = NHPAYEMartShoppingViewController(encData: encData)
 self.present(navController, animated:true, completion: nil)
 ```
 
